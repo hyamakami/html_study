@@ -1,0 +1,129 @@
+@charset "UTF-8";
+
+body{
+	font-family: "メイリオ","Hiragino Kaku Gothic Pro", sans-serif;
+	background-image: url("./pic/bg096/bg096_09.gif");
+	margin: 0 auto;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+strong{
+	color: red;
+}
+
+header h1 a{
+	color: #0000000;
+	text-decoration: none;
+}
+
+header h1{
+	margin: 0;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	font-size: 30px;
+}
+
+nav ul{
+	margin: 0;
+	padding: 15px;
+	list-style: none;
+	background-color: #75dbe7;
+	display: flex;
+}
+
+nav li{
+	align-items: center;
+}
+
+nav li a{
+	padding: 15px;
+	color: #000000;
+	font-size: 14px;
+	text-decoration: none;
+}
+
+nav li img{
+	margin: 0;
+	padding: 0;
+}
+
+nav li a:hover{
+	background-color: #eeeeee;
+}
+
+nav ul:after{
+	content: "";
+	display: block;
+	clear: both;
+}
+
+nav li{
+	float: left;
+	width: auto;
+}
+
+.box-main{
+	box-sizing: border-box;
+	display: flex;
+	flex: 1;
+	min-height: 100vh;
+}
+
+main{
+	box-sizing: border-box;
+	margin: 5px;
+	background-color: white;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+.wrapper-content{
+	min-height: 100hv;
+	background-image: linear-gradient(#c9ffbf, #ffafbd);
+	text-align: center;
+}
+
+.wrapper-grid{
+	display: grid;
+	gap: 26px;
+	grid-template-columns: 1fr 1fr 1fr;
+	margin-top: 6%;
+	margin-bottom: 50px;
+}
+
+.item{
+	text-align: center;	
+}
+
+aside{
+	box-sizing: border-box;
+	width: 300px;
+	margin: 5px;
+	display: flex;
+	flex-direction: column;
+}
+
+.profile{
+	box-sizing: border-box;
+	margin: 5px;
+	background-color: white;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.archive{
+	box-sizing: border-box;
+	margin: 5px;
+	background-color: white;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+footer{
+	height: 300px;
+}
