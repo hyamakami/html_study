@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>canvas 01</title>
+	<script>
+		window.onload = function(){
+			var canvas = document.getElementById("mycanvas");
+			var ctx = canvas.getContext("2d");
+			ctx.beginPath();
+			ctx.moveTo(0,0);
+			var i = 0;
+			timer = setInterval(function(){
+				ctx.lineTo(i, i*i);
+				ctx.stroke();
+				i++;
+			}, 1000);
+
+		}
+	</script>
+</head>
+
+<body>
+	<canvas id="mycanvas" width="640" height="400"></canvas>
+</body>
+
+</html>
