@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>統計検定準1級 第9回 一般化線形モデル</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{--bg:#f6f8fb;--fg:#222a35;--card:#fff;--line:#d3dbe8;--acc:#2a7de1;--soft:#eef4fd;--mute:#6b778a;--warn:#fff6e5;--wl:#e0a030}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--fg:#e3e8ef;--card:#1b222b;--line:#2f3a48;--acc:#6aaaf5;--soft:#1d2a3b;--mute:#98a4b6;--warn:#2d2616;--wl:#c28a2a}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 -apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+main{max-width:860px;margin:0 auto;padding:12px 16px 40px;background:var(--card);min-height:100vh;box-sizing:border-box}
+.top{color:var(--mute);font-size:.9rem;margin-top:12px}
+h1{font-size:1.65rem;margin:.3em 0 .4em;line-height:1.4}
+h2{font-size:1.3rem;border-bottom:3px solid var(--acc);padding-bottom:.15em;margin:2em 0 .6em}
+h3{font-size:1.1rem;margin:1.6em 0 .4em;border-left:5px solid var(--acc);padding-left:.5em}
+h4{font-size:1rem;margin:1.2em 0 .3em}
+blockquote{margin:1em 0;padding:.4em 1em;background:var(--soft);border-left:5px solid var(--acc);border-radius:0 8px 8px 0}
+blockquote p{margin:.4em 0}
+table{border-collapse:collapse;margin:1em 0;width:100%;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--soft)}
+img{max-width:100%;display:block;margin:12px auto;border:1px solid var(--line);border-radius:8px;background:#fff}
+img+em{display:block;text-align:center;color:var(--mute);font-size:.85rem;margin-top:-6px}
+code{background:var(--soft);padding:1px 5px;border-radius:4px}
+a{color:var(--acc)}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{display:flex;justify-content:space-between;margin:28px 0 8px;font-size:.9rem}
+.credit{color:var(--mute);font-size:.8rem}
+</style></head><body><main>
+<div class="top">統計検定準1級　解説教材　／　対応動画：<a href="../stat09_glm.mp4">stat09_glm.mp4</a></div>
+<h1>第9回　一般化線形モデル</h1>
+<blockquote>
+<p><strong>この回の学習目標</strong></p>
+<ul>
+<li>GLM の 3 要素（分布・線形予測子・リンク関数）を説明できる</li>
+<li>ロジスティック回帰・ポアソン回帰の係数を解釈できる</li>
+<li>逸脱度によるモデル比較、過分散、ROC/AUC を理解する</li>
+</ul>
+</blockquote>
+<h2>1. GLM の 3 つの要素</h2>
+<p>線形回帰は応答が連続値で正規分布に従う場合の手法でした。応答が 0/1 や件数のときは、一般化線形モデル（GLM）を使います。</p>
+<ol>
+<li><strong>応答の分布</strong>：指数型分布族（正規・ポアソン・二項・ガンマなど）</li>
+<li><strong>線形予測子</strong>：$\eta=\beta_0+\beta_1x_1+\cdots+\beta_px_p$</li>
+<li><strong>リンク関数</strong>：平均 $\mu=E[Y]$ と線形予測子を結ぶ $g(\mu)=\eta$</li>
+</ol>
+<p>確率は 0 と 1 の間、件数は正の値ですから、直線で直接表すとはみ出してしまいます。リンク関数で変換するのが GLM の発想です。<strong>正規分布＋恒等リンク ＝ 線形回帰</strong> で、線形回帰は GLM の特別な場合です。</p>
+<p><img alt="GLMの構造" src="img/stat09_glm_s02.png" /></p>
+<h2>2. 指数型分布族と正準リンク</h2>
+<p>指数型分布族の密度は</p>
+<p>$$f(y;\theta,\phi)=\exp\left\{\frac{y\theta-b(\theta)}{a(\phi)}+c(y,\phi)\right\}$$</p>
+<p>の形で書け、</p>
+<p>$$E[Y]=b'(\theta),\qquad V[Y]=b''(\theta)\,a(\phi)$$</p>
+<p>です。$\theta=\eta$ となるリンクが <strong>正準リンク</strong> です。</p>
+<table>
+<thead>
+<tr>
+<th>分布</th>
+<th>正準リンク</th>
+<th>典型的な応答</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>正規</td>
+<td>恒等 $g(\mu)=\mu$</td>
+<td>連続値</td>
+</tr>
+<tr>
+<td>ポアソン</td>
+<td>$\log\mu$</td>
+<td>カウント</td>
+</tr>
+<tr>
+<td>二項</td>
+<td>$\mathrm{logit}\,\mu=\log\frac{\mu}{1-\mu}$</td>
+<td>0/1・割合</td>
+</tr>
+<tr>
+<td>ガンマ</td>
+<td>逆数 $1/\mu$</td>
+<td>正の連続値</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="指数型分布族と正準リンク" src="img/stat09_glm_s03.png" /></p>
+<h2>3. ロジスティック回帰</h2>
+<p>応答が 0/1（ベルヌーイ分布）、リンクはロジット：</p>
+<p>$$\log\frac{p}{1-p}=\beta_0+\beta_1x\quad\Longleftrightarrow\quad p=\frac1{1+e^{-\eta}}$$</p>
+<p>$\eta=0$ のとき $p=0.5$。係数が正なら $x$ が大きいほど確率が上がります。</p>
+<p><strong>係数の解釈（オッズ比）</strong>：$x$ が 1 増えると <strong>オッズ $p/(1-p)$ が $e^{\beta_1}$ 倍</strong> になります（確率が $e^{\beta_1}$ 倍ではない）。$\beta_1=0.7$ ならオッズは約 $e^{0.7}\approx2.01$ 倍。</p>
+<p><strong>推定</strong>：最尤法。解析的に解けないので、反復重み付き最小二乗法（IRLS）やニュートン法を使います。係数の検定はワルド検定、小標本では尤度比検定の方が信頼できます。</p>
+<p><img alt="ロジスティック回帰" src="img/stat09_glm_s04.png" /></p>
+<h2>4. ポアソン回帰</h2>
+<p>件数のデータ。応答はポアソン分布、リンクは対数：</p>
+<p>$$\log\mu=\beta_0+\beta_1x\quad\Longleftrightarrow\quad\mu=e^{\beta_0}e^{\beta_1x}$$</p>
+<p>平均は必ず正。<strong>$x$ が 1 増えると平均が $e^{\beta_1}$ 倍</strong> になる、掛け算の効果です。観察期間・人口が個体ごとに違うときは、$\log t$ を <strong>オフセット項</strong>（係数を 1 に固定した項）として入れ、率（単位時間あたり件数）をモデル化します。</p>
+<p><img alt="ポアソン回帰" src="img/stat09_glm_s06.png" /></p>
+<h2>5. 逸脱度とモデル比較</h2>
+<p><strong>逸脱度</strong>（デビアンス）は、飽和モデル（各観測値に 1 母数）との対数尤度の差の 2 倍：</p>
+<p>$$D=2\{\ell(\text{飽和})-\ell(\text{モデル})\}$$</p>
+<p>小さいほど当てはまりが良い。<strong>入れ子になったモデル</strong>（小モデルが大モデルの特別な場合）の比較では、逸脱度の差が、追加した母数の数 $q$ を自由度とする $\chi^2_q$ に漸近的に従います（尤度比検定）。AIC やピアソンの $\chi^2$ 統計量も併用します。</p>
+<p><img alt="逸脱度" src="img/stat09_glm_s07.png" /></p>
+<h2>6. 過分散</h2>
+<p>ポアソン回帰は $V[Y]=E[Y]$ を仮定しますが、実データでは分散の方が大きいこと（<strong>過分散</strong>）がよくあります。放置すると標準誤差が過小評価され、有意になりすぎます。</p>
+<ul>
+<li>診断：ピアソンの $\chi^2$ を残差自由度で割った値が 1 よりかなり大きい</li>
+<li>対策：<strong>準ポアソンモデル</strong>（$V[Y]=\phi\mu$、$\phi$ を推定）、<strong>負の二項回帰</strong></li>
+</ul>
+<p><img alt="過分散" src="img/stat09_glm_s08.png" /></p>
+<h2>7. ROC 曲線と AUC</h2>
+<p>確率に閾値を決めて陽性・陰性に分類すると、閾値によって <strong>感度</strong>（真陽性率）と <strong>特異度</strong> が変わります。</p>
+<ul>
+<li><strong>ROC 曲線</strong>：閾値を動かしながら、横軸に偽陽性率（$1-$特異度）、縦軸に真陽性率をプロット</li>
+<li><strong>AUC</strong>（曲線の下の面積）：1 に近いほど良く、0.5 は無作為（当てずっぽう）。ランダムに選んだ陽性・陰性ペアで、陽性のスコアが高い確率とも解釈できる</li>
+</ul>
+<p><img alt="ROC曲線" src="img/stat09_glm_s09.png" /></p>
+<h2>演習問題</h2>
+<h3>演習1　ロジスティック回帰</h3>
+<p><strong>問題</strong>　$\mathrm{logit}(p)=-2+0.5x$。$x=4$ のときの $p$、$x$ が 2 増えたときのオッズ比、$x=6$ のときの $p$ を求めよ。</p>
+<p><strong>解答</strong>　$x=4$ で $\eta=0$ なので $p=\mathbf{0.5}$。$x$ が 2 増えるとロジットが $0.5\times2=1$ 増えるので <strong>オッズ比は $e\approx2.72$</strong>。$x=6$ で $\eta=1$、$p=\dfrac{e}{1+e}\approx\mathbf{0.731}$。</p>
+<h3>演習2　ポアソン回帰</h3>
+<p><strong>問題</strong>　$\log\mu=0.5+0.2x$。$x=3$ での平均と、$x$ が 1 増えたときの平均の倍率は。</p>
+<p><strong>解答</strong>　$x=3$ で $\eta=1.1$、$\mu=e^{1.1}\approx\mathbf{3.00}$。倍率は $e^{0.2}\approx\mathbf{1.22}$（22% 増）。足し算でなく掛け算の変化。</p>
+<h3>演習3　逸脱度の比較</h3>
+<p><strong>問題</strong>　モデル A の残差逸脱度 85.3（自由度 47）。変数を 2 つ追加したモデル B は 78.1（自由度 45）。5% で追加は有意か（$\chi^2_2(0.05)=5.99$）。</p>
+<p><strong>解答</strong>　$\Delta D=85.3-78.1=7.2$、自由度の差 2。$7.2&gt;5.99$ なので <strong>追加した 2 変数は有意</strong>。</p>
+<h3>演習4（発展）　ロジスティック回帰の確率の変化</h3>
+<p><strong>問題</strong>　演習1 で、$x=4$ から $x=5$ への確率の変化は何ポイントか。また、確率ではなくオッズ比で説明されるのはなぜか。</p>
+<p><strong>解答</strong>　$x=5$ で $\eta=0.5$、$p=1/(1+e^{-0.5})\approx0.622$。変化は約 $+12.2$ ポイント。確率の変化は $x$ の位置で異なる（S 字曲線）が、<strong>オッズ比は $x$ によらず一定（$e^{0.5}$ 倍/単位）</strong> なので、係数の解釈に使いやすい。</p>
+<h2>まとめ・チェックリスト</h2>
+<ul>
+<li>[ ] GLM の 3 要素と、線形回帰が特別な場合であることを説明できる</li>
+<li>[ ] 正準リンク（恒等・log・logit・逆数）を対応づけられる</li>
+<li>[ ] ロジスティック回帰の係数 → オッズ比、ポアソン回帰の係数 → 率の倍率を言える</li>
+<li>[ ] 逸脱度の差を使ったモデル比較、過分散の診断と対策を説明できる</li>
+<li>[ ] ROC 曲線・AUC の意味を説明できる</li>
+</ul>
+<p>次回：<strong>分散分析と実験計画法</strong></p>
+<footer><span><a href="stat08_regression.html">← 第8回</a></span><a href="index.html">索引</a><span><a href="stat10_anova_doe.html">第10回 →</a></span></footer>
+<p class="credit">動画の音声：VOICEVOX:ずんだもん / VOICEVOX:四国めたん　立ち絵：坂本アヒル様</p>
+</main></body></html>

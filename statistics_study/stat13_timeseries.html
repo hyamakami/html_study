@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>統計検定準1級 第13回 時系列解析</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{--bg:#f6f8fb;--fg:#222a35;--card:#fff;--line:#d3dbe8;--acc:#2a7de1;--soft:#eef4fd;--mute:#6b778a;--warn:#fff6e5;--wl:#e0a030}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--fg:#e3e8ef;--card:#1b222b;--line:#2f3a48;--acc:#6aaaf5;--soft:#1d2a3b;--mute:#98a4b6;--warn:#2d2616;--wl:#c28a2a}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 -apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+main{max-width:860px;margin:0 auto;padding:12px 16px 40px;background:var(--card);min-height:100vh;box-sizing:border-box}
+.top{color:var(--mute);font-size:.9rem;margin-top:12px}
+h1{font-size:1.65rem;margin:.3em 0 .4em;line-height:1.4}
+h2{font-size:1.3rem;border-bottom:3px solid var(--acc);padding-bottom:.15em;margin:2em 0 .6em}
+h3{font-size:1.1rem;margin:1.6em 0 .4em;border-left:5px solid var(--acc);padding-left:.5em}
+h4{font-size:1rem;margin:1.2em 0 .3em}
+blockquote{margin:1em 0;padding:.4em 1em;background:var(--soft);border-left:5px solid var(--acc);border-radius:0 8px 8px 0}
+blockquote p{margin:.4em 0}
+table{border-collapse:collapse;margin:1em 0;width:100%;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--soft)}
+img{max-width:100%;display:block;margin:12px auto;border:1px solid var(--line);border-radius:8px;background:#fff}
+img+em{display:block;text-align:center;color:var(--mute);font-size:.85rem;margin-top:-6px}
+code{background:var(--soft);padding:1px 5px;border-radius:4px}
+a{color:var(--acc)}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{display:flex;justify-content:space-between;margin:28px 0 8px;font-size:.9rem}
+.credit{color:var(--mute);font-size:.8rem}
+</style></head><body><main>
+<div class="top">統計検定準1級　解説教材　／　対応動画：<a href="../stat13_timeseries.mp4">stat13_timeseries.mp4</a></div>
+<h1>第13回　時系列解析</h1>
+<blockquote>
+<p><strong>この回の学習目標</strong></p>
+<ul>
+<li>定常性・自己相関を説明し、AR・MA・ARMA・ARIMA モデルの性質（分散・自己相関）を導出できる</li>
+<li>コレログラム（ACF/PACF）から次数を同定し、単位根・予測・残差診断の考え方を理解する</li>
+<li>状態空間モデル・カルマンフィルタ・ARCH/GARCH の概要を押さえる</li>
+</ul>
+</blockquote>
+<h2>1. 時系列の構成要素</h2>
+<p>時系列は <strong>トレンド $T_t$</strong>、<strong>季節変動 $S_t$</strong>、不規則変動 $\varepsilon_t$ に分けて考えます。</p>
+<ul>
+<li>加法モデル $y_t=T_t+S_t+\varepsilon_t$、乗法モデル $y_t=T_tS_t\varepsilon_t$（対数を取ると加法モデル）</li>
+<li>トレンドは <strong>移動平均</strong> で取り出す。季節の周期と同じ長さの移動平均を使うと、季節変動が打ち消される</li>
+<li>季節調整は、取り出した季節成分を取り除く操作</li>
+</ul>
+<p><img alt="時系列の構成要素" src="img/stat13_timeseries_s02.png" /></p>
+<h2>2. 定常性と自己相関</h2>
+<p>時系列を統計的に扱うには <strong>定常性</strong> が必要です。<strong>弱定常</strong> とは、</p>
+<p>$$E[X_t]=\mu\ (\text{一定}),\qquad V[X_t]=\sigma_X^2\ (\text{一定}),\qquad\mathrm{Cov}(X_t,X_{t+h})=\gamma(h)\ (\text{ラグ }h\text{ のみに依存})$$</p>
+<p>のこと。<strong>自己相関係数</strong> $\rho(h)=\gamma(h)/\gamma(0)$ を縦軸、ラグ $h$ を横軸にした図が <strong>コレログラム</strong>。互いに無相関で分散が一定の系列を <strong>白色雑音</strong> と呼び、あらゆるモデルの部品になります。</p>
+<p><img alt="定常性と自己相関" src="img/stat13_timeseries_s03.png" /></p>
+<h2>3. AR 過程</h2>
+<p><strong>AR(1)</strong>：$X_t=\phi X_{t-1}+\varepsilon_t$（$\varepsilon_t$ は白色雑音、分散 $\sigma^2$）。</p>
+<ul>
+<li><strong>定常条件 $|\phi|&lt;1$</strong></li>
+<li>平均 0、分散 $V[X_t]=\dfrac{\sigma^2}{1-\phi^2}$、自己相関 $\rho(h)=\phi^{h}$（指数的に減衰）</li>
+</ul>
+<p>導出：$V[X_t]=\phi^2V[X_{t-1}]+\sigma^2$ で定常なら $V=\phi^2V+\sigma^2$。</p>
+<p><strong>AR($p$)</strong> は特性方程式 $1-\phi_1z-\cdots-\phi_pz^p=0$ の根がすべて <strong>単位円の外側</strong> にあるとき定常。偏自己相関（PACF）はラグ $p$ で打ち切られます。</p>
+<p><img alt="AR過程" src="img/stat13_timeseries_s04.png" /></p>
+<h2>4. MA 過程</h2>
+<p><strong>MA(1)</strong>：$X_t=\varepsilon_t+\theta\varepsilon_{t-1}$。有限個の雑音の和なので <strong>常に定常</strong>。</p>
+<p>$$V[X_t]=(1+\theta^2)\sigma^2,\qquad\rho(1)=\frac{\theta}{1+\theta^2},\qquad\rho(h)=0\ (h\ge2)$$</p>
+<p>つまり <strong>自己相関がラグ $q$ で打ち切られ</strong>、偏自己相関は減衰します。$|\theta|&lt;1$ のとき <strong>反転可能</strong>（AR($\infty$) に書き直せる）。</p>
+<p><img alt="MA過程" src="img/stat13_timeseries_s05.png" /></p>
+<h2>5. 次数の同定</h2>
+<table>
+<thead>
+<tr>
+<th>モデル</th>
+<th>自己相関（ACF）</th>
+<th>偏自己相関（PACF）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AR($p$)</td>
+<td>減衰</td>
+<td>$p$ で打ち切り</td>
+</tr>
+<tr>
+<td>MA($q$)</td>
+<td>$q$ で打ち切り</td>
+<td>減衰</td>
+</tr>
+<tr>
+<td>ARMA</td>
+<td>減衰</td>
+<td>減衰</td>
+</tr>
+</tbody>
+</table>
+<p>実際のデータではっきりしないことも多く、AIC などで候補を比べます。</p>
+<p><img alt="次数の同定" src="img/stat13_timeseries_s06.png" /></p>
+<h2>6. ARMA と ARIMA</h2>
+<p><strong>ARMA($p,q$)</strong> は AR と MA の組合せで、少ない母数で表現できます。トレンドのある <strong>非定常</strong> な系列は <strong>差分</strong> $\nabla X_t=X_t-X_{t-1}$ を取って定常にします。$d$ 回差分した系列に ARMA を当てはめたものが <strong>ARIMA($p,d,q$)</strong> です。ランダムウォーク $X_t=X_{t-1}+\varepsilon_t$ は ARIMA(0,1,0)（1 階差分が白色雑音）。季節性があれば季節差分も使う <strong>季節 ARIMA</strong>。差分の取りすぎ（過剰差分）に注意。</p>
+<p><img alt="ARMAとARIMA" src="img/stat13_timeseries_s07.png" /></p>
+<h2>7. 単位根</h2>
+<p>AR(1) の $\phi=1$ を <strong>単位根</strong> といいます。定常系列は平均のまわりに戻りますが、単位根のある系列は <strong>分散が時間とともに増えます</strong>。<strong>ディッキー・フラー検定</strong>（$H_0$：単位根あり）で調べます。</p>
+<ul>
+<li>検定統計量は通常の $t$ 分布に従わない（専用の臨界値表を使う）</li>
+<li>無関係な単位根系列どうしを回帰すると有意に見える <strong>見せかけの回帰</strong> が起きる</li>
+</ul>
+<p><img alt="単位根" src="img/stat13_timeseries_s08.png" /></p>
+<h2>8. 推定と予測</h2>
+<p>AR のパラメータは自己相関から解く <strong>ユール・ウォーカー方程式</strong>（AR(1) なら $\hat\phi=\hat\rho(1)$）で推定でき、最尤法・条件付き最小二乗法も使います。</p>
+<p><strong>AR(1) の $h$ 期先予測</strong>（平均 $\mu$）：</p>
+<p>$$\hat X_{T+h}=\mu+\phi^h(X_T-\mu),\qquad\text{予測誤差分散}=\sigma^2\frac{1-\phi^{2h}}{1-\phi^2}$$</p>
+<p>先に行くほど予測値は平均に近づき、誤差分散は系列の分散 $\sigma^2/(1-\phi^2)$ に近づきます（予測区間が広がる）。</p>
+<p><img alt="推定と予測" src="img/stat13_timeseries_s09.png" /></p>
+<h2>9. モデル選択と残差診断</h2>
+<p>候補モデルは AIC・BIC で比べます。当てはめ後、<strong>残差が白色雑音か</strong> を確認します。残差の自己相関がすべて $\pm1.96/\sqrt n$ の帯の内側にあればよく、まとめて検定するのが <strong>リュング・ボックスの検定</strong>：</p>
+<p>$$Q=n(n+2)\sum_{k=1}^m\frac{\hat\rho_k^2}{n-k}\ \sim\ \chi^2_{m-p-q}$$</p>
+<p>（自由度は、推定した AR・MA の母数の数を引く。）</p>
+<p><img alt="残差診断" src="img/stat13_timeseries_s10.png" /></p>
+<h2>10. 状態空間モデルとカルマンフィルタ</h2>
+<p>観測できない <strong>状態</strong> が時間とともに変化し、それに雑音が加わったものを観測する、という考え方です。最も簡単な <strong>局所水準モデル</strong>：</p>
+<p>$$\mu_t=\mu_{t-1}+\eta_t\ (\text{状態}),\qquad y_t=\mu_t+\varepsilon_t\ (\text{観測})$$</p>
+<p><strong>カルマンフィルタ</strong> は、新しい観測が来るたびに「予測 → 観測との差にゲインをかけて修正」を逐次繰り返して状態を推定します。ゲインは状態と観測の雑音の大きさの比で決まります。ARIMA も状態空間表現できます。</p>
+<p><img alt="状態空間モデル" src="img/stat13_timeseries_s11.png" /></p>
+<h2>11. ARCH と GARCH</h2>
+<p>金融データでは変動の大きさが時間とともに変わり、大きな変動が続いて起きます（<strong>ボラティリティの集中</strong>）。条件付き分散を過去の二乗に依存させる <strong>ARCH(1)</strong>：$h_t=\alpha_0+\alpha_1X_{t-1}^2$。過去の分散 $h_{t-1}$ にも依存させたものが <strong>GARCH</strong>。</p>
+<p><img alt="ARCHとGARCH" src="img/stat13_timeseries_s12.png" /></p>
+<h2>演習問題</h2>
+<h3>演習1　AR(1)</h3>
+<p><strong>問題</strong>　AR(1) で $\phi=0.6$、雑音の分散 $\sigma^2=1.28$。$V[X_t]$、$\rho(2)$、$\gamma(2)$ を求めよ。</p>
+<p><strong>解答</strong>　$V[X_t]=\dfrac{1.28}{1-0.36}=\mathbf{2.0}$。$\rho(2)=0.6^2=\mathbf{0.36}$。$\gamma(2)=V\cdot\rho(2)=2.0\times0.36=\mathbf{0.72}$。</p>
+<h3>演習2　MA(1)</h3>
+<p><strong>問題</strong>　MA(1) で $\theta=0.5$。$V[X_t]$、$\rho(1)$、$\rho(2)$ を求めよ。</p>
+<p><strong>解答</strong>　$V[X_t]=(1+0.25)\sigma^2=\mathbf{1.25\sigma^2}$。$\gamma(1)=\theta\sigma^2$ より $\rho(1)=\dfrac{0.5}{1.25}=\mathbf{0.4}$。ラグ 2 以降は重なる雑音がなく $\rho(2)=\mathbf0$。</p>
+<h3>演習3　AR(1) の予測</h3>
+<p><strong>問題</strong>　AR(1)、平均 10、$\phi=0.8$、$\sigma^2=4$。最後の観測が 15 のとき、1 期先・2 期先の予測値と、2 期先の予測誤差分散を求めよ。</p>
+<p><strong>解答</strong>　$\hat X_{T+1}=10+0.8\times5=\mathbf{14}$、$\hat X_{T+2}=10+0.64\times5=\mathbf{13.2}$。2 期先の誤差分散 $=\sigma^2(1+\phi^2)=4\times1.64=\mathbf{6.56}$。</p>
+<h3>演習4（発展）　定常性の判定</h3>
+<p><strong>問題</strong>　$X_t=1.2X_{t-1}-0.2X_{t-2}+\varepsilon_t$ は定常か。</p>
+<p><strong>解答</strong>　特性方程式 $1-1.2z+0.2z^2=0$ を解くと $z=1,\ 5$。根の 1 つが単位円上（$z=1$）なので <strong>定常でない</strong>（単位根を含む）。$\nabla X_t$ が AR(1)（$\phi=0.2$）になる ARIMA(1,1,0)。</p>
+<h2>まとめ・チェックリスト</h2>
+<ul>
+<li>[ ] 弱定常の定義、自己相関、白色雑音を説明できる</li>
+<li>[ ] AR(1) の分散・自己相関、MA(1) の自己相関を導出できる</li>
+<li>[ ] ACF/PACF の打ち切り・減衰パターンから次数を同定できる</li>
+<li>[ ] 差分・ARIMA・単位根（DF 検定、見せかけの回帰）を説明できる</li>
+<li>[ ] AR(1) の予測値・予測誤差分散、リュング・ボックス検定を使える</li>
+<li>[ ] 状態空間モデル・カルマンフィルタ・ARCH の概要を説明できる</li>
+</ul>
+<p>次回：<strong>標本調査法</strong>（最終回）</p>
+<footer><span><a href="stat12_multivariate_analysis.html">← 第12回</a></span><a href="index.html">索引</a><span><a href="stat14_sampling.html">第14回 →</a></span></footer>
+<p class="credit">動画の音声：VOICEVOX:ずんだもん / VOICEVOX:四国めたん　立ち絵：坂本アヒル様</p>
+</main></body></html>

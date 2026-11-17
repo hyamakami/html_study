@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>統計検定準1級 第7回 いろいろな検定</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{--bg:#f6f8fb;--fg:#222a35;--card:#fff;--line:#d3dbe8;--acc:#2a7de1;--soft:#eef4fd;--mute:#6b778a;--warn:#fff6e5;--wl:#e0a030}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--fg:#e3e8ef;--card:#1b222b;--line:#2f3a48;--acc:#6aaaf5;--soft:#1d2a3b;--mute:#98a4b6;--warn:#2d2616;--wl:#c28a2a}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 -apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+main{max-width:860px;margin:0 auto;padding:12px 16px 40px;background:var(--card);min-height:100vh;box-sizing:border-box}
+.top{color:var(--mute);font-size:.9rem;margin-top:12px}
+h1{font-size:1.65rem;margin:.3em 0 .4em;line-height:1.4}
+h2{font-size:1.3rem;border-bottom:3px solid var(--acc);padding-bottom:.15em;margin:2em 0 .6em}
+h3{font-size:1.1rem;margin:1.6em 0 .4em;border-left:5px solid var(--acc);padding-left:.5em}
+h4{font-size:1rem;margin:1.2em 0 .3em}
+blockquote{margin:1em 0;padding:.4em 1em;background:var(--soft);border-left:5px solid var(--acc);border-radius:0 8px 8px 0}
+blockquote p{margin:.4em 0}
+table{border-collapse:collapse;margin:1em 0;width:100%;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--soft)}
+img{max-width:100%;display:block;margin:12px auto;border:1px solid var(--line);border-radius:8px;background:#fff}
+img+em{display:block;text-align:center;color:var(--mute);font-size:.85rem;margin-top:-6px}
+code{background:var(--soft);padding:1px 5px;border-radius:4px}
+a{color:var(--acc)}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{display:flex;justify-content:space-between;margin:28px 0 8px;font-size:.9rem}
+.credit{color:var(--mute);font-size:.8rem}
+</style></head><body><main>
+<div class="top">統計検定準1級　解説教材　／　対応動画：<a href="../stat07_tests.mp4">stat07_tests.mp4</a></div>
+<h1>第7回　いろいろな検定</h1>
+<blockquote>
+<p><strong>この回の学習目標</strong></p>
+<ul>
+<li>平均・分散・度数・順位・相関の検定を、前提条件と検定統計量の分布とセットで使い分けられる</li>
+<li>$\chi^2$ 検定の自由度の数え方を間違えない</li>
+<li>ノンパラメトリック検定が必要な場面を判断できる</li>
+</ul>
+</blockquote>
+<h2>1. 平均の差の検定（$t$ 検定）</h2>
+<table>
+<thead>
+<tr>
+<th>場面</th>
+<th>統計量</th>
+<th>分布</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 標本</td>
+<td>$t=\dfrac{\bar x-\mu_0}{s/\sqrt n}$</td>
+<td>$t_{n-1}$</td>
+</tr>
+<tr>
+<td>2 標本・等分散</td>
+<td>$t=\dfrac{\bar x_1-\bar x_2}{s_p\sqrt{1/n_1+1/n_2}}$</td>
+<td>$t_{n_1+n_2-2}$</td>
+</tr>
+<tr>
+<td>2 標本・等分散を仮定しない（ウェルチ）</td>
+<td>$t=\dfrac{\bar x_1-\bar x_2}{\sqrt{s_1^2/n_1+s_2^2/n_2}}$</td>
+<td>自由度は近似式（ウェルチ・サタースウェイト）</td>
+</tr>
+<tr>
+<td>対応あり</td>
+<td>差 $d_i$ の 1 標本 $t$ 検定</td>
+<td>$t_{n-1}$</td>
+</tr>
+</tbody>
+</table>
+<p>合併分散 $s_p^2=\dfrac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2}$。迷ったらウェルチの検定が安全です。</p>
+<p><img alt="平均の差の検定" src="img/stat07_tests_s02.png" /></p>
+<h2>2. 等分散性の検定</h2>
+<p>2 つの母分散が等しいか（$H_0:\sigma_1^2=\sigma_2^2$）は</p>
+<p>$$F=\frac{s_1^2}{s_2^2}\sim F_{n_1-1,\ n_2-1}$$</p>
+<p>で検定します。両側検定では下側の点 $F_{1-\alpha/2}(m,n)=1/F_{\alpha/2}(n,m)$（自由度を入れ替えた逆数）を使います。$F$ 検定は <strong>正規性からのずれに敏感</strong>。3 群以上ならバートレット検定（正規性に敏感）やルビーン検定（頑健）。</p>
+<p><img alt="等分散性の検定" src="img/stat07_tests_s03.png" /></p>
+<h2>3. 適合度検定</h2>
+<p>観測度数 $O_i$ が期待度数 $E_i$ に合っているかを検定します。</p>
+<p>$$\chi^2=\sum_{i=1}^k\frac{(O_i-E_i)^2}{E_i}\ \sim\ \chi^2_{k-1-m}$$</p>
+<p>（$m$：期待度数の計算のために <strong>データから推定した母数の数</strong>。）期待度数がどれも 5 以上が目安です。</p>
+<p>例：サイコロを 120 回振って度数が $(25,17,15,23,24,16)$、期待度数は各 20。</p>
+<p>$$\chi^2=\frac{25+9+25+9+16+16}{20}=5.0&lt;\chi^2_5(0.05)=11.07$$</p>
+<p>公平でないとは言えない。</p>
+<p><img alt="適合度検定" src="img/stat07_tests_s04.png" /></p>
+<h2>4. 独立性の検定（分割表）</h2>
+<p>$r\times c$ 分割表で、行と列が独立かを調べます。<strong>独立なら</strong> 各セルの期待度数は</p>
+<p>$$E_{ij}=\frac{R_iC_j}{N}\quad(\text{行の計}\times\text{列の計}\div\text{総数})$$</p>
+<p>統計量は適合度と同じ形で、自由度は $(r-1)(c-1)$。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>反応あり</th>
+<th>反応なし</th>
+<th>計</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A 群</td>
+<td>30 (22.5)</td>
+<td>20 (27.5)</td>
+<td>50</td>
+</tr>
+<tr>
+<td>B 群</td>
+<td>15 (22.5)</td>
+<td>35 (27.5)</td>
+<td>50</td>
+</tr>
+<tr>
+<td>計</td>
+<td>45</td>
+<td>55</td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+<p>（ ）は期待度数。$\chi^2=\dfrac{7.5^2}{22.5}+\dfrac{7.5^2}{27.5}+\dfrac{7.5^2}{22.5}+\dfrac{7.5^2}{27.5}\approx9.09&gt;\chi^2_1(0.05)=3.84$ なので独立でない。期待度数が小さい 2×2 表には <strong>フィッシャーの正確検定</strong> を使います。</p>
+<p><img alt="独立性の検定" src="img/stat07_tests_s05.png" /></p>
+<h2>5. ノンパラメトリック検定</h2>
+<p>分布の形を仮定せず、データを <strong>順位</strong> に置き換えて使う検定です。</p>
+<table>
+<thead>
+<tr>
+<th>場面</th>
+<th>検定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2 群（対応なし）</td>
+<td>ウィルコクソンの順位和検定（マン・ホイットニーの $U$ 検定）</td>
+</tr>
+<tr>
+<td>2 群（対応あり）</td>
+<td>ウィルコクソンの符号付順位検定、符号検定</td>
+</tr>
+<tr>
+<td>3 群以上</td>
+<td>クラスカル・ウォリス検定</td>
+</tr>
+<tr>
+<td>相関</td>
+<td>スピアマンの順位相関、ケンドールの $\tau$</td>
+</tr>
+</tbody>
+</table>
+<p>全体で順位をつけ、片方の群の順位の和を統計量にします。正規分布のときでも $t$ 検定より検出力は少し落ちるだけなので、分布が怪しいときの安全な選択です。</p>
+<p><img alt="順位和検定" src="img/stat07_tests_s06.png" /></p>
+<h2>6. コルモゴロフ・スミルノフ検定</h2>
+<p>分布全体の適合を、経験分布関数 $F_n(x)$ と理論の分布関数 $F(x)$ の最大の差</p>
+<p>$$D_n=\sup_x|F_n(x)-F(x)|$$</p>
+<p>で検定します。2 標本の分布の比較にも使えます。母数を標本から推定した場合は臨界値が変わる（リリフォース検定など）ことに注意。</p>
+<p><img alt="KS検定" src="img/stat07_tests_s07.png" /></p>
+<h2>7. 相関係数の検定</h2>
+<p>母相関 $\rho=0$ の検定は</p>
+<p>$$t=\frac{r\sqrt{n-2}}{\sqrt{1-r^2}}\sim t_{n-2}$$</p>
+<p>$\rho\ne0$ の仮説や信頼区間には <strong>フィッシャーの $z$ 変換</strong> を使います。</p>
+<p>$$z=\tanh^{-1}r=\frac12\ln\frac{1+r}{1-r}\approx N\left(\tanh^{-1}\rho,\ \frac1{n-3}\right)$$</p>
+<p>$z$ の区間を作って $\tanh$ で戻すと $\rho$ の信頼区間です。$n=30$, $r=0.6$ なら $z=0.693$、$z\pm1.96/\sqrt{27}=[0.316,1.070]$、逆変換して約 <strong>[0.31, 0.79]</strong>。</p>
+<p><img alt="フィッシャーのz変換" src="img/stat07_tests_s08.png" /></p>
+<h2>演習問題</h2>
+<h3>演習1　2 標本の $t$ 検定</h3>
+<p><strong>問題</strong>　2 群各 10 人、平均 12 と 10、不偏分散 4 と 6。母分散が等しいとして平均の差を 5% で検定せよ（$t_{18}(0.025)=2.101$）。</p>
+<p><strong>解答</strong>　$s_p^2=\dfrac{9\cdot4+9\cdot6}{18}=5$、標準誤差 $\sqrt{5\cdot\dfrac2{10}}=1$、$t=\dfrac{12-10}{1}=2.0$。$2.0&lt;2.101$ なので <strong>有意でない</strong>（差があるとは言い切れない）。</p>
+<h3>演習2　独立性の検定</h3>
+<p><strong>問題</strong>　A 群 30 人中 18 人、B 群 30 人中 10 人が反応あり。反応の有無は群と独立か、5% で検定せよ（$\chi^2_1(0.05)=3.84$）。</p>
+<p><strong>解答</strong>　反応ありの合計 28、なし 32。期待度数は反応あり 14、なし 16（各群）。$|O-E|=4$。</p>
+<p>$$\chi^2=16\left(\frac1{14}+\frac1{16}+\frac1{14}+\frac1{16}\right)=16\times0.2679\approx4.29&gt;3.84$$</p>
+<p>5% 水準で <strong>独立でない</strong>。</p>
+<h3>演習3　自由度の数え方</h3>
+<p><strong>問題</strong>　ポアソン分布への適合を調べるため、データを 0, 1, 2, 3, 4 以上の 5 カテゴリーに分け、$\lambda$ をデータから推定した。$\chi^2=6.5$。自由度と 5% での判断は（$\chi^2_3(0.05)=7.81$）。</p>
+<p><strong>解答</strong>　自由度 $=5-1-1=\mathbf3$。$6.5&lt;7.81$ なので、ポアソン分布に従うという仮説は <strong>棄却できない</strong>。推定した母数の分を引き忘れて自由度 4 にしてしまうと、判断の基準がずれる。</p>
+<h3>演習4（発展）　対応のある $t$ 検定</h3>
+<p><strong>問題</strong>　同じ 5 人の薬の投与前後の差が $+2,+3,+1,+4,+0$。平均差が 0 かを 5% で検定せよ（$t_4(0.025)=2.776$）。</p>
+<p><strong>解答</strong>　$\bar d=2$, $s_d^2=\dfrac{0+1+1+4+4}{4}=2.5$, $s_d=1.58$。$t=\dfrac{2}{1.58/\sqrt5}=2.83&gt;2.776$ で <strong>有意</strong>。</p>
+<h2>まとめ・チェックリスト</h2>
+<ul>
+<li>[ ] $t$ 検定（1 標本・2 標本・ウェルチ・対応あり）を使い分けられる</li>
+<li>[ ] $F$ 検定・適合度・独立性の統計量と自由度（$k-1-m$、$(r-1)(c-1)$）を言える</li>
+<li>[ ] 順位検定・KS 検定が必要な場面を説明できる</li>
+<li>[ ] 相関係数の検定とフィッシャーの $z$ 変換を使える</li>
+</ul>
+<p>次回：<strong>線形回帰モデル</strong></p>
+<footer><span><a href="stat06_testing_theory.html">← 第6回</a></span><a href="index.html">索引</a><span><a href="stat08_regression.html">第8回 →</a></span></footer>
+<p class="credit">動画の音声：VOICEVOX:ずんだもん / VOICEVOX:四国めたん　立ち絵：坂本アヒル様</p>
+</main></body></html>

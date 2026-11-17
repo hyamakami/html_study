@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>統計検定準1級 第6回 区間推定と仮説検定の理論</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{--bg:#f6f8fb;--fg:#222a35;--card:#fff;--line:#d3dbe8;--acc:#2a7de1;--soft:#eef4fd;--mute:#6b778a;--warn:#fff6e5;--wl:#e0a030}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--fg:#e3e8ef;--card:#1b222b;--line:#2f3a48;--acc:#6aaaf5;--soft:#1d2a3b;--mute:#98a4b6;--warn:#2d2616;--wl:#c28a2a}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 -apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+main{max-width:860px;margin:0 auto;padding:12px 16px 40px;background:var(--card);min-height:100vh;box-sizing:border-box}
+.top{color:var(--mute);font-size:.9rem;margin-top:12px}
+h1{font-size:1.65rem;margin:.3em 0 .4em;line-height:1.4}
+h2{font-size:1.3rem;border-bottom:3px solid var(--acc);padding-bottom:.15em;margin:2em 0 .6em}
+h3{font-size:1.1rem;margin:1.6em 0 .4em;border-left:5px solid var(--acc);padding-left:.5em}
+h4{font-size:1rem;margin:1.2em 0 .3em}
+blockquote{margin:1em 0;padding:.4em 1em;background:var(--soft);border-left:5px solid var(--acc);border-radius:0 8px 8px 0}
+blockquote p{margin:.4em 0}
+table{border-collapse:collapse;margin:1em 0;width:100%;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--soft)}
+img{max-width:100%;display:block;margin:12px auto;border:1px solid var(--line);border-radius:8px;background:#fff}
+img+em{display:block;text-align:center;color:var(--mute);font-size:.85rem;margin-top:-6px}
+code{background:var(--soft);padding:1px 5px;border-radius:4px}
+a{color:var(--acc)}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{display:flex;justify-content:space-between;margin:28px 0 8px;font-size:.9rem}
+.credit{color:var(--mute);font-size:.8rem}
+</style></head><body><main>
+<div class="top">統計検定準1級　解説教材　／　対応動画：<a href="../stat06_testing_theory.mp4">stat06_testing_theory.mp4</a></div>
+<h1>第6回　区間推定と仮説検定の理論</h1>
+<blockquote>
+<p><strong>この回の学習目標</strong></p>
+<ul>
+<li>信頼区間の意味を正しく説明し、平均・分散・比率の区間を構成できる</li>
+<li>第一種・第二種の誤り、p 値、検出力、標本サイズ設計を説明できる</li>
+<li>ネイマン・ピアソンの補題、尤度比・ワルド・スコア検定の考え方を理解する</li>
+</ul>
+</blockquote>
+<h2>1. 信頼区間の意味</h2>
+<p>95% 信頼区間とは、<strong>同じ手順で標本を取り直して区間を作ることを繰り返したとき、その 95% が真の値を含む</strong> という意味です。</p>
+<blockquote>
+<p>「この区間が 95% の確率で真の値を含む」と言うのは厳密には誤りです。真の値 $\theta$ は固定された定数で、確率的に動くのは <strong>区間の方</strong> だからです（ベイズの信用区間との違い、第11回）。</p>
+</blockquote>
+<p><img alt="信頼区間の意味" src="img/stat06_testing_theory_s02.png" /></p>
+<h2>2. 母平均・母分散の信頼区間（正規母集団）</h2>
+<table>
+<thead>
+<tr>
+<th>場合</th>
+<th>信頼区間</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$\sigma$ 既知</td>
+<td>$\bar X\pm z_{\alpha/2}\dfrac{\sigma}{\sqrt n}$</td>
+</tr>
+<tr>
+<td>$\sigma$ 未知</td>
+<td>$\bar X\pm t_{\alpha/2}(n-1)\dfrac{s}{\sqrt n}$</td>
+</tr>
+<tr>
+<td>分散</td>
+<td>$\left[\dfrac{(n-1)s^2}{\chi^2_{\alpha/2}(n-1)},\ \dfrac{(n-1)s^2}{\chi^2_{1-\alpha/2}(n-1)}\right]$</td>
+</tr>
+</tbody>
+</table>
+<p>（$\chi^2_{\alpha/2}$ は上側 $\alpha/2$ 点。）$t$ 分布の自由度は $n-1$。分散の信頼区間は $\chi^2$ 分布が非対称なので <strong>左右対称ではありません</strong>。これらは $t=\frac{\bar X-\mu}{s/\sqrt n}\sim t_{n-1}$、$\frac{(n-1)s^2}{\sigma^2}\sim\chi^2_{n-1}$（第4回）を $\mu$, $\sigma^2$ について解いたものです。</p>
+<p><img alt="母平均の信頼区間" src="img/stat06_testing_theory_s03.png" /></p>
+<h2>3. 母比率の信頼区間と標本サイズの設計</h2>
+<p>標本比率 $\hat p$ は $n$ が大きいとき近似的に正規分布なので</p>
+<p>$$\hat p\pm z_{\alpha/2}\sqrt{\frac{\hat p(1-\hat p)}{n}}$$</p>
+<p>許容誤差 $E$ で調査したいとき、必要な標本サイズは $n\ge\left(\dfrac{z_{\alpha/2}}{E}\right)^2p(1-p)$。$p$ が不明なら $p(1-p)$ が最大になる $p=0.5$ で計算します。95% で誤差 3% なら約 1,070 人、5% なら約 385 人。</p>
+<p><img alt="必要標本サイズ" src="img/stat06_testing_theory_s04.png" /></p>
+<h2>4. 仮説検定の枠組み</h2>
+<p>帰無仮説 $H_0$ のもとで検定統計量が棄却域に入ったら $H_0$ を棄却します。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$H_0$ が正しい</th>
+<th>$H_1$ が正しい</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$H_0$ を棄却</td>
+<td><strong>第一種の誤り</strong>（確率 $\alpha$）</td>
+<td>正しい（確率 $1-\beta$ ＝ <strong>検出力</strong>）</td>
+</tr>
+<tr>
+<td>$H_0$ を棄却しない</td>
+<td>正しい</td>
+<td><strong>第二種の誤り</strong>（確率 $\beta$）</td>
+</tr>
+</tbody>
+</table>
+<p>$\alpha$ を小さくすると $\beta$ は大きくなるトレードオフがあり、両方を減らすには標本サイズを増やします。</p>
+<p><img alt="H0とH1・誤りの確率" src="img/stat06_testing_theory_s05.png" /></p>
+<h2>5. p 値</h2>
+<p><strong>p 値</strong>：$H_0$ が正しいと仮定したとき、観測された値と同じかそれより極端な値が出る確率。$p\le\alpha$ なら棄却。</p>
+<ul>
+<li>p 値は「$H_0$ が正しい確率」ではない。効果の大きさも表さない</li>
+<li><strong>信頼区間と検定は表裏</strong>：95% 信頼区間が $\theta_0$ を含まない $\Leftrightarrow$ 両側 5% 水準で $H_0:\theta=\theta_0$ が棄却される</li>
+<li>両側検定の p 値は片側の 2 倍</li>
+</ul>
+<p><img alt="p値" src="img/stat06_testing_theory_s06.png" /></p>
+<h2>6. 検出力とサンプルサイズ</h2>
+<p>検出力は、真の効果の大きさ $\delta=(\mu-\mu_0)/\sigma$ と標本サイズ $n$ で決まります。両側 $z$ 検定（有意水準 $\alpha$）では</p>
+<p>$$\text{検出力}=\Phi\left(-z_{\alpha/2}+\delta\sqrt n\right)+\Phi\left(-z_{\alpha/2}-\delta\sqrt n\right)$$</p>
+<p>$\delta=0$ のとき検出力は $\alpha$。$n$ が大きいほど小さな効果でも検出できます。実験前に <strong>検出力 0.8 程度</strong> になるよう標本サイズを設計するのが一般的です。</p>
+<p><img alt="検出力" src="img/stat06_testing_theory_s07.png" /></p>
+<h2>7. ネイマン・ピアソンの補題</h2>
+<p>単純仮説 $H_0:\theta=\theta_0$ 対 $H_1:\theta=\theta_1$ の検定で、</p>
+<p>$$\frac{L(\theta_1)}{L(\theta_0)}&gt;k$$</p>
+<p>のとき棄却する検定（$k$ は有意水準 $\alpha$ で決める）は、有意水準 $\alpha$ の検定の中で <strong>最強力（検出力最大）</strong> です。正規分布の平均の検定では尤度比が $x$ の単調増加関数になるので、「標本平均が大きいとき棄却」というおなじみの検定と一致します。<strong>単調尤度比</strong> を持つ分布族の片側仮説では、一様最強力検定になります。</p>
+<p><img alt="ネイマン・ピアソンの補題" src="img/stat06_testing_theory_s08.png" /></p>
+<h2>8. 尤度比検定・ワルド検定・スコア検定</h2>
+<p>複合仮説でも使える 3 つの漸近的な検定です。対数尤度 $\ell(\theta)$、最尤推定量 $\hat\theta$、帰無仮説の値 $\theta_0$ について、制約の数を $q$ とすると、いずれも漸近的に $\chi^2_q$ に従います。</p>
+<table>
+<thead>
+<tr>
+<th>検定</th>
+<th>統計量</th>
+<th>見ているもの</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>尤度比</td>
+<td>$2\{\ell(\hat\theta)-\ell(\theta_0)\}$</td>
+<td>対数尤度の <strong>縦の差</strong></td>
+</tr>
+<tr>
+<td>ワルド</td>
+<td>$\dfrac{(\hat\theta-\theta_0)^2}{\widehat V[\hat\theta]}$</td>
+<td>$\hat\theta$ と $\theta_0$ の <strong>横の距離</strong></td>
+</tr>
+<tr>
+<td>スコア</td>
+<td>$\dfrac{\ell'(\theta_0)^2}{nI(\theta_0)}$</td>
+<td>$\theta_0$ での <strong>傾き</strong>（MLE の計算が不要）</td>
+</tr>
+</tbody>
+</table>
+<p>標本サイズが大きいと 3 つはほぼ同じ結果になります。</p>
+<p><img alt="3つの漸近検定" src="img/stat06_testing_theory_s09.png" /></p>
+<h2>演習問題</h2>
+<h3>演習1　信頼区間</h3>
+<p><strong>問題</strong>　正規母集団から 16 個の標本を取り、平均 52、標準偏差 8 を得た。母平均の 95% 信頼区間を求めよ（$t_{15}(0.025)=2.131$）。</p>
+<p><strong>解答</strong>　標準誤差 $8/\sqrt{16}=2$。$52\pm2.131\times2=52\pm4.26$、すなわち <strong>[47.74, 56.26]</strong>。母分散が未知なので正規分布ではなく $t$ 分布を使う。</p>
+<h3>演習2　検出力</h3>
+<p><strong>問題</strong>　$\sigma=15$ の正規母集団。$H_0:\mu=100$ 対 $H_1:\mu&gt;100$、$n=36$、有意水準 5% の片側検定。真の平均が 105 のときの検出力は。</p>
+<p><strong>解答</strong>　標準誤差 $15/6=2.5$。棄却域は $\bar x&gt;100+1.645\times2.5=104.11$。真の平均 105 のもとで</p>
+<p>$$P(\bar X&gt;104.11)=P\left(Z&gt;\frac{104.11-105}{2.5}\right)=P(Z&gt;-0.355)\approx\mathbf{0.64}$$</p>
+<h3>演習3　p 値</h3>
+<p><strong>問題</strong>　両側検定で検定統計量が 2.1（標準正規分布）。p 値と、5%・1% 水準での判断を答えよ。</p>
+<p><strong>解答</strong>　$p=2P(Z\ge2.1)=2\times0.0179\approx\mathbf{0.036}$。5% 水準では有意（$0.036&lt;0.05$）、1% 水準では有意でない。片側検定なら $p\approx0.018$。</p>
+<h3>演習4（発展）　信頼区間と検定</h3>
+<p><strong>問題</strong>　演習1 の標本から、$H_0:\mu=50$ を有意水準 5% で両側検定するとどうなるか。</p>
+<p><strong>解答</strong>　95% 信頼区間 [47.74, 56.26] は 50 を含むので <strong>棄却されない</strong>。（直接計算：$t=(52-50)/2=1.0&lt;2.131$。）</p>
+<h2>まとめ・チェックリスト</h2>
+<ul>
+<li>[ ] 信頼区間の意味（手順の性質）を説明できる</li>
+<li>[ ] 平均（既知・未知）・分散・比率の信頼区間と必要標本サイズを計算できる</li>
+<li>[ ] 第一種・第二種の誤り、検出力、p 値を正しく説明できる</li>
+<li>[ ] ネイマン・ピアソンの補題と、尤度比・ワルド・スコア検定の違いを言える</li>
+</ul>
+<p>次回：<strong>いろいろな検定</strong></p>
+<footer><span><a href="stat05_estimation.html">← 第5回</a></span><a href="index.html">索引</a><span><a href="stat07_tests.html">第7回 →</a></span></footer>
+<p class="credit">動画の音声：VOICEVOX:ずんだもん / VOICEVOX:四国めたん　立ち絵：坂本アヒル様</p>
+</main></body></html>

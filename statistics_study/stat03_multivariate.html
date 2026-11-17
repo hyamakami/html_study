@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>統計検定準1級 第3回 多変量分布と多変量正規分布</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{--bg:#f6f8fb;--fg:#222a35;--card:#fff;--line:#d3dbe8;--acc:#2a7de1;--soft:#eef4fd;--mute:#6b778a;--warn:#fff6e5;--wl:#e0a030}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--fg:#e3e8ef;--card:#1b222b;--line:#2f3a48;--acc:#6aaaf5;--soft:#1d2a3b;--mute:#98a4b6;--warn:#2d2616;--wl:#c28a2a}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 -apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+main{max-width:860px;margin:0 auto;padding:12px 16px 40px;background:var(--card);min-height:100vh;box-sizing:border-box}
+.top{color:var(--mute);font-size:.9rem;margin-top:12px}
+h1{font-size:1.65rem;margin:.3em 0 .4em;line-height:1.4}
+h2{font-size:1.3rem;border-bottom:3px solid var(--acc);padding-bottom:.15em;margin:2em 0 .6em}
+h3{font-size:1.1rem;margin:1.6em 0 .4em;border-left:5px solid var(--acc);padding-left:.5em}
+h4{font-size:1rem;margin:1.2em 0 .3em}
+blockquote{margin:1em 0;padding:.4em 1em;background:var(--soft);border-left:5px solid var(--acc);border-radius:0 8px 8px 0}
+blockquote p{margin:.4em 0}
+table{border-collapse:collapse;margin:1em 0;width:100%;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--soft)}
+img{max-width:100%;display:block;margin:12px auto;border:1px solid var(--line);border-radius:8px;background:#fff}
+img+em{display:block;text-align:center;color:var(--mute);font-size:.85rem;margin-top:-6px}
+code{background:var(--soft);padding:1px 5px;border-radius:4px}
+a{color:var(--acc)}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{display:flex;justify-content:space-between;margin:28px 0 8px;font-size:.9rem}
+.credit{color:var(--mute);font-size:.8rem}
+</style></head><body><main>
+<div class="top">統計検定準1級　解説教材　／　対応動画：<a href="../stat03_multivariate.mp4">stat03_multivariate.mp4</a></div>
+<h1>第3回　多変量分布と多変量正規分布</h1>
+<blockquote>
+<p><strong>この回の学習目標</strong></p>
+<ul>
+<li>同時分布・周辺分布・条件付き分布の関係を計算できる</li>
+<li>共分散・相関、独立と無相関の違い、全分散の法則を使える</li>
+<li>2 変数の変換（ヤコビアン）と和の分布（畳み込み）を扱える</li>
+<li>多変量正規分布の性質（周辺・線形変換・条件付き）と、マハラノビス距離を理解する</li>
+</ul>
+</blockquote>
+<h2>1. 同時分布・周辺分布・条件付き分布</h2>
+<p>2 つの確率変数 $(X,Y)$ の <strong>同時確率（密度）</strong> $f(x,y)$ から、</p>
+<p>$$\text{周辺：}\ f_X(x)=\int f(x,y)\,dy\quad(\text{離散なら和}),\qquad \text{条件付き：}\ f(y\mid x)=\frac{f(x,y)}{f_X(x)}$$</p>
+<p>独立 $\Leftrightarrow f(x,y)=f_X(x)f_Y(y)$（すべての $x,y$ で）。</p>
+<p>離散の例（行：$X$、列：$Y$）</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$Y=0$</th>
+<th>$Y=1$</th>
+<th>$Y=2$</th>
+<th>計</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$X=0$</td>
+<td>0.10</td>
+<td>0.20</td>
+<td>0.10</td>
+<td><strong>0.40</strong></td>
+</tr>
+<tr>
+<td>$X=1$</td>
+<td>0.20</td>
+<td>0.30</td>
+<td>0.10</td>
+<td><strong>0.60</strong></td>
+</tr>
+<tr>
+<td>計</td>
+<td><strong>0.30</strong></td>
+<td><strong>0.50</strong></td>
+<td><strong>0.20</strong></td>
+<td>1.00</td>
+</tr>
+</tbody>
+</table>
+<p>行・列の合計が周辺分布。$X=0$ のときの $Y$ の条件付き分布は、行を 0.4 で割って $(0.25,\,0.5,\,0.25)$。</p>
+<p><img alt="同時・周辺・条件付き分布" src="img/stat03_multivariate_s02.png" /></p>
+<h2>2. 共分散と相関係数</h2>
+<p>$$\mathrm{Cov}(X,Y)=E[(X-E[X])(Y-E[Y])]=E[XY]-E[X]E[Y],\qquad \rho_{XY}=\frac{\mathrm{Cov}(X,Y)}{\sqrt{V[X]V[Y]}}$$</p>
+<ul>
+<li>$-1\le\rho\le1$。$|\rho|=1$ は完全な直線関係</li>
+<li>相関は <strong>直線的な関係</strong> の強さしか測れない</li>
+<li>$V[X+Y]=V[X]+V[Y]+2\mathrm{Cov}(X,Y)$、$\mathrm{Cov}(aX,bY)=ab\,\mathrm{Cov}(X,Y)$</li>
+</ul>
+<p><img alt="共分散と相関" src="img/stat03_multivariate_s03.png" /></p>
+<h2>3. 独立と無相関</h2>
+<p>独立 $\Rightarrow$ 無相関（共分散 0）。<strong>逆は一般に成り立ちません</strong>。</p>
+<p>反例：$X\sim N(0,1)$, $Y=X^2$。$Y$ は $X$ で決まる（従属）のに、$\mathrm{Cov}(X,Y)=E[X^3]-E[X]E[X^2]=0$。ただし <strong>二変量（多変量）正規分布のときに限り、無相関 $\Leftrightarrow$ 独立</strong> です。</p>
+<p><img alt="独立と無相関" src="img/stat03_multivariate_s04.png" /></p>
+<h2>4. 条件付き期待値と全分散の法則</h2>
+<p>$E[Y\mid X]$ は $X$ の関数（確率変数）です。</p>
+<p>$$E[Y]=E\big[E[Y\mid X]\big]\quad(\text{繰り返し期待値の法則})$$</p>
+<p>$$V[Y]=E\big[V[Y\mid X]\big]+V\big[E[Y\mid X]\big]\quad(\text{全分散の法則})$$</p>
+<p>「<strong>群内のばらつきの平均 ＋ 群間のばらつき</strong>」という分解で、分散分析（第10回）と同じ発想です。</p>
+<p><img alt="条件付き期待値と全分散の法則" src="img/stat03_multivariate_s05.png" /></p>
+<blockquote>
+<p><strong>例（複合分布）</strong>　個数 $N$ と各回の値 $X_i$（独立同分布で $N$ とも独立）の合計 $S=\sum_{i=1}^NX_i$ では
+$E[S]=E[N]E[X]$、$V[S]=E[N]V[X]+V[N]E[X]^2$。</p>
+</blockquote>
+<h2>5. 2 変数の変換とヤコビアン</h2>
+<p>$(x,y)\to(u,v)$ の 1 対 1 変換で、</p>
+<p>$$f_{U,V}(u,v)=f_{X,Y}(x,y)\,|J|,\qquad J=\det\begin{pmatrix}\partial x/\partial u&amp;\partial x/\partial v\\\partial y/\partial u&amp;\partial y/\partial v\end{pmatrix}$$</p>
+<p>（1 変数の $|dx/dy|$ の拡張）。例：極座標 $x=r\cos\theta,\ y=r\sin\theta$ では $|J|=r$。独立な標準正規 $X,Y$ に使うと、$R^2=X^2+Y^2\sim\chi^2_2$、角度 $\theta\sim U(0,2\pi)$ で $R$ と独立になる（ボックス＝ミュラー法の根拠）。</p>
+<p><img alt="ヤコビアン" src="img/stat03_multivariate_s06.png" /></p>
+<h2>6. 和の分布（畳み込み）</h2>
+<p>独立な $X,Y$ の和 $Z=X+Y$ の密度は</p>
+<p>$$f_Z(z)=\int f_X(x)f_Y(z-x)\,dx$$</p>
+<p>一様分布 2 個の和は三角形、3 個、4 個…と足すほど釣り鐘型に近づきます（中心極限定理）。畳み込みを直接計算せず、<strong>積率母関数の積</strong> で分布を同定する方法も使えます。</p>
+<p><img alt="畳み込み" src="img/stat03_multivariate_s07.png" /></p>
+<h2>7. 多変量正規分布</h2>
+<p>$p$ 次元ベクトル $X\sim N_p(\mu,\Sigma)$（平均ベクトル $\mu$、分散共分散行列 $\Sigma$）の密度は</p>
+<p>$$f(x)=\frac{1}{(2\pi)^{p/2}|\Sigma|^{1/2}}\exp\left\{-\frac12(x-\mu)^T\Sigma^{-1}(x-\mu)\right\}$$</p>
+<p>等高線は楕円で、相関が強いほど細長くなります。重要な性質は次の 4 つです。</p>
+<ol>
+<li><strong>周辺分布</strong> も正規分布（$X_j\sim N(\mu_j,\Sigma_{jj})$）</li>
+<li><strong>線形変換</strong> で閉じる：$AX+b\sim N(A\mu+b,\ A\Sigma A^T)$</li>
+<li><strong>無相関 $\Leftrightarrow$ 独立</strong></li>
+<li><strong>条件付き分布</strong> も正規分布（次項）</li>
+</ol>
+<p><img alt="多変量正規分布" src="img/stat03_multivariate_s08.png" /></p>
+<h2>8. 多変量正規分布の条件付き分布</h2>
+<p>二変量正規分布で $X=x$ を与えたとき、</p>
+<p>$$Y\mid X=x\ \sim\ N\left(\mu_Y+\rho\frac{\sigma_Y}{\sigma_X}(x-\mu_X),\ \ \sigma_Y^2(1-\rho^2)\right)$$</p>
+<ul>
+<li>条件付き期待値は $x$ の <strong>一次関数</strong>（これが回帰直線そのもの。傾き $\rho\sigma_Y/\sigma_X=\mathrm{Cov}/\sigma_X^2$）</li>
+<li>条件付き分散 $\sigma_Y^2(1-\rho^2)$ は $x$ に <strong>よらず一定</strong>（$|\rho|$ が大きいほど小さくなる）</li>
+</ul>
+<p><img alt="条件付き分布" src="img/stat03_multivariate_s09.png" /></p>
+<h2>9. マハラノビス距離</h2>
+<p>$$D^2=(x-\mu)^T\Sigma^{-1}(x-\mu)$$</p>
+<p>ばらつきの大きい方向は距離を小さく見積もる、共分散を考慮した距離です。$X\sim N_p(\mu,\Sigma)$ のとき $D^2\sim\chi^2_p$ なので、外れ値の検出や確率楕円（二変量の 95% 楕円は $D^2\le\chi^2_{2;0.05}=5.99$）に使えます。</p>
+<p><img alt="マハラノビス距離" src="img/stat03_multivariate_s10.png" /></p>
+<h2>演習問題</h2>
+<h3>演習1　共分散と相関</h3>
+<p><strong>問題</strong>　$X,Y$ は 0 か 1 をとり、同時確率は $P(0,0)=0.3,\ P(0,1)=0.2,\ P(1,0)=0.1,\ P(1,1)=0.4$。共分散と相関係数を求めよ。</p>
+<p><strong>解答</strong>　$E[X]=P(X=1)=0.5$, $E[Y]=P(Y=1)=0.6$, $E[XY]=P(1,1)=0.4$ なので $\mathrm{Cov}=0.4-0.5\times0.6=\mathbf{0.1}$。
+ベルヌーイなので $V[X]=0.5\times0.5=0.25$, $V[Y]=0.6\times0.4=0.24$、$\rho=\dfrac{0.1}{\sqrt{0.25\times0.24}}=\dfrac{0.1}{\sqrt{0.06}}\approx\mathbf{0.41}$。</p>
+<h3>演習2　全分散の法則</h3>
+<p><strong>問題</strong>　ある店の 1 日の客数 $N$ は平均 3 のポアソン分布。各客の購入額は独立に平均 2（千円）、分散 1 で、$N$ とも独立。売上合計 $S$ の期待値と分散を求めよ。</p>
+<p><strong>解答</strong>　$N$ を与えると $E[S\mid N]=2N$, $V[S\mid N]=N$。
+$E[S]=E[2N]=\mathbf{6}$。
+$V[S]=E[V[S\mid N]]+V[E[S\mid N]]=E[N]+V[2N]=3+4\times3=\mathbf{15}$（ポアソンの分散は平均に等しい）。</p>
+<h3>演習3　二変量正規分布</h3>
+<p><strong>問題</strong>　$(X,Y)$ は二変量正規で平均はともに 0、$V[X]=4$, $V[Y]=9$, $\mathrm{Cov}(X,Y)=3$。$\rho$、$E[Y\mid X=2]$、$V[Y\mid X=2]$ を求めよ。</p>
+<p><strong>解答</strong>　$\rho=\dfrac{3}{2\times3}=\mathbf{0.5}$。
+$E[Y\mid X=x]=\dfrac{\mathrm{Cov}}{V[X]}x=\dfrac34x$ なので $x=2$ で $\mathbf{1.5}$。
+$V[Y\mid X]=9(1-0.25)=\mathbf{6.75}$（$=9-3^2/4$ でも同じ）。</p>
+<h3>演習4（発展）　線形変換</h3>
+<p><strong>問題</strong>　$X_1,X_2$ が独立に $N(0,1)$ に従うとき、$U=X_1+X_2$, $V=X_1-X_2$ は独立か。</p>
+<p><strong>解答</strong>　$(U,V)$ は $(X_1,X_2)$ の線形変換なので二変量正規。$\mathrm{Cov}(U,V)=V[X_1]-V[X_2]=0$ で無相関、<strong>正規なので独立</strong>。</p>
+<h2>まとめ・チェックリスト</h2>
+<ul>
+<li>[ ] 同時分布から周辺・条件付き分布を求められる</li>
+<li>[ ] 共分散の計算、独立と無相関の違い（反例と正規分布のときの例外）を説明できる</li>
+<li>[ ] 全分散の法則 $V[Y]=E[V[Y\mid X]]+V[E[Y\mid X]]$ を使える</li>
+<li>[ ] ヤコビアン変換と畳み込みの考え方を説明できる</li>
+<li>[ ] 多変量正規分布の 4 性質と、条件付き分布の平均・分散の式を書ける</li>
+</ul>
+<p>次回：<strong>大数の法則・中心極限定理・標本分布</strong></p>
+<footer><span><a href="stat02_continuous.html">← 第2回</a></span><a href="index.html">索引</a><span><a href="stat04_limit_sampling.html">第4回 →</a></span></footer>
+<p class="credit">動画の音声：VOICEVOX:ずんだもん / VOICEVOX:四国めたん　立ち絵：坂本アヒル様</p>
+</main></body></html>

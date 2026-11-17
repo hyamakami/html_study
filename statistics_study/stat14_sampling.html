@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>統計検定準1級 第14回 標本調査法</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{--bg:#f6f8fb;--fg:#222a35;--card:#fff;--line:#d3dbe8;--acc:#2a7de1;--soft:#eef4fd;--mute:#6b778a;--warn:#fff6e5;--wl:#e0a030}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--fg:#e3e8ef;--card:#1b222b;--line:#2f3a48;--acc:#6aaaf5;--soft:#1d2a3b;--mute:#98a4b6;--warn:#2d2616;--wl:#c28a2a}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 -apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+main{max-width:860px;margin:0 auto;padding:12px 16px 40px;background:var(--card);min-height:100vh;box-sizing:border-box}
+.top{color:var(--mute);font-size:.9rem;margin-top:12px}
+h1{font-size:1.65rem;margin:.3em 0 .4em;line-height:1.4}
+h2{font-size:1.3rem;border-bottom:3px solid var(--acc);padding-bottom:.15em;margin:2em 0 .6em}
+h3{font-size:1.1rem;margin:1.6em 0 .4em;border-left:5px solid var(--acc);padding-left:.5em}
+h4{font-size:1rem;margin:1.2em 0 .3em}
+blockquote{margin:1em 0;padding:.4em 1em;background:var(--soft);border-left:5px solid var(--acc);border-radius:0 8px 8px 0}
+blockquote p{margin:.4em 0}
+table{border-collapse:collapse;margin:1em 0;width:100%;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--soft)}
+img{max-width:100%;display:block;margin:12px auto;border:1px solid var(--line);border-radius:8px;background:#fff}
+img+em{display:block;text-align:center;color:var(--mute);font-size:.85rem;margin-top:-6px}
+code{background:var(--soft);padding:1px 5px;border-radius:4px}
+a{color:var(--acc)}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{display:flex;justify-content:space-between;margin:28px 0 8px;font-size:.9rem}
+.credit{color:var(--mute);font-size:.8rem}
+</style></head><body><main>
+<div class="top">統計検定準1級　解説教材　／　対応動画：<a href="../stat14_sampling.mp4">stat14_sampling.mp4</a></div>
+<h1>第14回　標本調査法</h1>
+<blockquote>
+<p><strong>この回の学習目標</strong></p>
+<ul>
+<li>単純無作為抽出の推定量・分散・有限母集団修正を計算できる</li>
+<li>層化抽出（比例配分・ネイマン配分）・集落抽出・系統抽出・多段抽出の特徴を説明できる</li>
+<li>比推定量、ホルビッツ・トンプソン推定量、非標本誤差を理解する</li>
+</ul>
+</blockquote>
+<h2>1. 標本調査の基本</h2>
+<p><strong>全数調査</strong> は母集団の全員を調べ、<strong>標本調査</strong> は一部を調べて母集団の平均・合計・比率を推測します。誤差は 2 種類あります。</p>
+<ul>
+<li><strong>標本誤差</strong>：標本の選び方による誤差。標本サイズを増やせば小さくなる。確率的に抽出するので統計的に評価できる</li>
+<li><strong>非標本誤差</strong>：無回答、測定の誤り、母集団リストの不備（カバレッジ誤差）など。<strong>標本サイズを増やしても減らない</strong></li>
+</ul>
+<p><img alt="標本調査の基本" src="img/stat14_sampling_s02.png" /></p>
+<h2>2. 単純無作為抽出</h2>
+<p>大きさ $N$ の母集団から、非復元で $n$ 個を等しい確率で選びます。抽出率 $f=n/N$。母平均 $\bar Y$ の推定量は標本平均 $\bar y$（不偏）、母合計 $Y=N\bar Y$ は $\hat Y=N\bar y$。</p>
+<p>$$V[\bar y]=(1-f)\frac{S^2}{n},\qquad S^2=\frac1{N-1}\sum_{i=1}^N(Y_i-\bar Y)^2$$</p>
+<p>$(1-f)$ が <strong>有限母集団修正</strong>（第1回の超幾何分布の分散の係数と同じ形）で、抽出率が小さければ（目安 5% 未満）ほぼ無視できます。$S^2$ は標本の不偏分散 $s^2$ で置き換えて</p>
+<p>$$\hat V[\bar y]=(1-f)\frac{s^2}{n},\qquad\hat V[\hat Y]=N^2\hat V[\bar y]$$</p>
+<p>母比率 $P$ は $\hat p$（0/1 変数の平均）で、$\hat V[\hat p]=(1-f)\dfrac{\hat p(1-\hat p)}{n-1}$。</p>
+<p><img alt="有限母集団修正" src="img/stat14_sampling_s03.png" /></p>
+<h2>3. 層化抽出</h2>
+<p>母集団を似た者どうしの <strong>層</strong>（$h=1,\dots,L$、大きさ $N_h$、重み $W_h=N_h/N$）に分け、層ごとに標本を取ります。</p>
+<p>$$\bar y_{st}=\sum_hW_h\bar y_h,\qquad V[\bar y_{st}]=\sum_hW_h^2(1-f_h)\frac{S_h^2}{n_h}$$</p>
+<p>層間の違いが誤差に入らないので、<strong>層内が均質で層間の差が大きい</strong> ほど単純無作為抽出より精度が上がります。分散は層ごとの分散を足すだけです。</p>
+<p><img alt="層化抽出" src="img/stat14_sampling_s04.png" /></p>
+<h2>4. 標本の配分</h2>
+<p>層ごとの標本サイズ $n_h$ の決め方です。</p>
+<table>
+<thead>
+<tr>
+<th>配分</th>
+<th>$n_h$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>比例配分</td>
+<td>$n\dfrac{N_h}{N}$（層の大きさに比例）</td>
+</tr>
+<tr>
+<td>ネイマン配分（最適配分）</td>
+<td>$\propto N_hS_h$（ばらつきの大きい層に多く）</td>
+</tr>
+<tr>
+<td>費用を考慮</td>
+<td>$\propto\dfrac{N_hS_h}{\sqrt{c_h}}$（$c_h$：層 $h$ の 1 個あたり費用）</td>
+</tr>
+</tbody>
+</table>
+<p>同じ総サイズ $n$ なら、ネイマン配分が $V[\bar y_{st}]$ を最小にします。</p>
+<p><img alt="標本の配分" src="img/stat14_sampling_s05.png" /></p>
+<h2>5. 集落抽出</h2>
+<p>母集団が自然な集団（集落：学校・世帯・地域など）に分かれているとき、<strong>集落を単位に抽出して、選んだ集落は全員を調べます</strong>。名簿が個人単位でなくても実施でき、調査の手間が少ないのが利点です。</p>
+<p>同じ集落の中は似ていることが多いので（<strong>級内相関 $\rho$ が高い</strong>）、精度は単純無作為抽出より悪くなりがちです。集落の大きさを $m$ として <strong>設計効果</strong> は $\mathrm{deff}\approx1+(m-1)\rho$。層化とは逆に、<strong>集落内が異質で集落間が同質</strong> なのが理想です。</p>
+<p><img alt="集落抽出" src="img/stat14_sampling_s06.png" /></p>
+<h2>6. 系統抽出</h2>
+<p>名簿から <strong>等間隔</strong> $k=N/n$ で抽出します（開始点は $1$〜$k$ から無作為）。手間が少なく、名簿がうまく並んでいれば層化抽出に近い効果もありますが、<strong>名簿に周期性があり、その周期と間隔が重なると大きく偏ります</strong>。</p>
+<p><img alt="系統抽出" src="img/stat14_sampling_s07.png" /></p>
+<h2>7. 多段抽出</h2>
+<p>全国調査のように母集団が大きいときは段階的に抽出します（例：市区町村 → 世帯）。<strong>二段抽出</strong> は、選んだ一次抽出単位（集落）の中でさらに <strong>一部だけ</strong> を選びます（集落抽出は全員を調査）。各段の確率が決まっているので最終的な包含確率が計算でき、分散は <strong>第一段の誤差 + 第二段の誤差</strong> からなります。</p>
+<h2>8. 比推定</h2>
+<p>調べたい変数 $y$ と強く関係する補助変数 $x$ があり、$x$ の母集団合計 $X$ が <strong>既知</strong> のとき、</p>
+<p>$$\hat R=\frac{\bar y}{\bar x},\qquad\hat Y_R=\hat R\,X$$</p>
+<p>（<strong>比推定量</strong>。標本から $y$ と $x$ の比を求め、$x$ の母合計にかける。）$x$ と $y$ の相関が高く、原点を通る直線に近いほど、単純な推定量 $N\bar y$ より分散が小さくなります。ただし <strong>バイアスが少しある</strong>（一致推定量）。比が一定でないときは <strong>回帰推定量</strong> を使います。</p>
+<p><img alt="比推定" src="img/stat14_sampling_s09.png" /></p>
+<h2>9. 包含確率と重み付け</h2>
+<p>個体 $i$ が標本に入る確率を <strong>包含確率</strong> $\pi_i$ と呼びます。確率が不均一な抽出（確率比例抽出など）では、<strong>ホルビッツ・トンプソン推定量</strong></p>
+<p>$$\hat Y_{HT}=\sum_{i\in s}\frac{y_i}{\pi_i}$$</p>
+<p>が母合計の不偏推定量です。確率が小さい個体ほど多くの個体を代表する、と考えて重み $1/\pi_i$ をかけます。無回答がある場合も、回答確率を使った重み付けで偏りを補正しますが、限界があり、根本的には無回答を減らす努力が必要です。</p>
+<h2>演習問題</h2>
+<h3>演習1　単純無作為抽出</h3>
+<p><strong>問題</strong>　$N=1000$ から $n=100$ を非復元抽出。標本平均 50、標本不偏分散 400。平均の標準誤差と 95% 信頼区間、母合計の推定値とその標準誤差を求めよ。</p>
+<p><strong>解答</strong>　$f=0.1$。$\hat V[\bar y]=0.9\times\dfrac{400}{100}=3.6$、標準誤差 $\sqrt{3.6}\approx\mathbf{1.90}$。95% 区間 $50\pm1.96\times1.90\approx\mathbf{[46.3,\ 53.7]}$。母合計 $\hat Y=1000\times50=\mathbf{50000}$、標準誤差 $1000\times1.90\approx\mathbf{1900}$。</p>
+<h3>演習2　層化抽出</h3>
+<p><strong>問題</strong>　2 層、重み $(0.6,0.4)$、標本サイズ $(60,40)$、層の平均 $(40,60)$、標本不偏分散 $(36,64)$。有限母集団修正は無視して、全体の平均の推定値とその標準誤差を求めよ。</p>
+<p><strong>解答</strong>　$\bar y_{st}=0.6\times40+0.4\times60=\mathbf{48}$。
+$\hat V=0.6^2\cdot\dfrac{36}{60}+0.4^2\cdot\dfrac{64}{40}=0.216+0.256=0.472$、標準誤差 $\sqrt{0.472}\approx\mathbf{0.687}$。</p>
+<h3>演習3　ネイマン配分</h3>
+<p><strong>問題</strong>　3 層、$N_h=(500,300,200)$、$S_h=(10,20,40)$、総標本サイズ 100。比例配分とネイマン配分を求めよ。</p>
+<p><strong>解答</strong>　比例配分は $(\mathbf{50,\ 30,\ 20})$。ネイマン配分は $N_hS_h=(5000,6000,8000)$、比 $5:6:8$（合計 19）より
+$100\times\dfrac{(5,6,8)}{19}\approx(\mathbf{26.3,\ 31.6,\ 42.1})$。ばらつきの大きい第 3 層に多く割り当てられる。</p>
+<h3>演習4（発展）　比推定</h3>
+<p><strong>問題</strong>　母集団 $N=500$ の世帯数、補助変数（世帯人数）の母合計 $X=1500$ が既知。標本 20 世帯で $\bar y=40$、$\bar x=2.5$。母合計 $Y$ の比推定値は。</p>
+<p><strong>解答</strong>　$\hat R=40/2.5=16$、$\hat Y_R=16\times1500=\mathbf{24000}$。（単純な $N\bar y=500\times40=20000$ とは異なる。$x$ の母合計 $X$ の情報を活用している。）</p>
+<h2>まとめ・チェックリスト</h2>
+<ul>
+<li>[ ] 標本誤差と非標本誤差の違いを説明できる</li>
+<li>[ ] 単純無作為抽出の $V[\bar y]=(1-f)S^2/n$ と母合計の推定を計算できる</li>
+<li>[ ] 層化抽出の推定量・分散、比例配分とネイマン配分を計算できる</li>
+<li>[ ] 集落抽出（級内相関・設計効果）・系統抽出（周期性）・多段抽出の特徴を説明できる</li>
+<li>[ ] 比推定量とホルビッツ・トンプソン推定量を使える</li>
+</ul>
+<p>これで全 14 回が終了です。公式の過去問で出題形式に慣れ、数表（正規・$\chi^2$・$t$・$F$）の読み方も確認しておきましょう。</p>
+<footer><span><a href="stat13_timeseries.html">← 第13回</a></span><a href="index.html">索引</a><span></span></footer>
+<p class="credit">動画の音声：VOICEVOX:ずんだもん / VOICEVOX:四国めたん　立ち絵：坂本アヒル様</p>
+</main></body></html>

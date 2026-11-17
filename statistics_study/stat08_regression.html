@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>統計検定準1級 第8回 線形回帰モデル</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{--bg:#f6f8fb;--fg:#222a35;--card:#fff;--line:#d3dbe8;--acc:#2a7de1;--soft:#eef4fd;--mute:#6b778a;--warn:#fff6e5;--wl:#e0a030}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--fg:#e3e8ef;--card:#1b222b;--line:#2f3a48;--acc:#6aaaf5;--soft:#1d2a3b;--mute:#98a4b6;--warn:#2d2616;--wl:#c28a2a}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 -apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+main{max-width:860px;margin:0 auto;padding:12px 16px 40px;background:var(--card);min-height:100vh;box-sizing:border-box}
+.top{color:var(--mute);font-size:.9rem;margin-top:12px}
+h1{font-size:1.65rem;margin:.3em 0 .4em;line-height:1.4}
+h2{font-size:1.3rem;border-bottom:3px solid var(--acc);padding-bottom:.15em;margin:2em 0 .6em}
+h3{font-size:1.1rem;margin:1.6em 0 .4em;border-left:5px solid var(--acc);padding-left:.5em}
+h4{font-size:1rem;margin:1.2em 0 .3em}
+blockquote{margin:1em 0;padding:.4em 1em;background:var(--soft);border-left:5px solid var(--acc);border-radius:0 8px 8px 0}
+blockquote p{margin:.4em 0}
+table{border-collapse:collapse;margin:1em 0;width:100%;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--soft)}
+img{max-width:100%;display:block;margin:12px auto;border:1px solid var(--line);border-radius:8px;background:#fff}
+img+em{display:block;text-align:center;color:var(--mute);font-size:.85rem;margin-top:-6px}
+code{background:var(--soft);padding:1px 5px;border-radius:4px}
+a{color:var(--acc)}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{display:flex;justify-content:space-between;margin:28px 0 8px;font-size:.9rem}
+.credit{color:var(--mute);font-size:.8rem}
+</style></head><body><main>
+<div class="top">統計検定準1級　解説教材　／　対応動画：<a href="../stat08_regression.mp4">stat08_regression.mp4</a></div>
+<h1>第8回　線形回帰モデル</h1>
+<blockquote>
+<p><strong>この回の学習目標</strong></p>
+<ul>
+<li>最小二乗法を行列で表し、幾何学的（直交射影）に理解する</li>
+<li>ガウス・マルコフの定理、分散分析表、$R^2$、係数の検定・区間推定を使える</li>
+<li>残差診断・てこ比・多重共線性・変数選択・正則化（リッジ／ラッソ）を説明できる</li>
+</ul>
+</blockquote>
+<h2>1. 単回帰と最小二乗法</h2>
+<p>$$y_i=\beta_0+\beta_1x_i+\varepsilon_i,\qquad \varepsilon_i:\ \text{平均 0・等分散 }\sigma^2\text{・互いに無相関}$$</p>
+<p>残差の二乗和 $\sum(y_i-\beta_0-\beta_1x_i)^2$ を最小にすると</p>
+<p>$$\hat\beta_1=\frac{S_{xy}}{S_{xx}},\qquad\hat\beta_0=\bar y-\hat\beta_1\bar x$$</p>
+<p>（直線は必ず点 $(\bar x,\bar y)$ を通る。$S_{xy}=\sum(x_i-\bar x)(y_i-\bar y)$。）</p>
+<p><img alt="最小二乗法" src="img/stat08_regression_s02.png" /></p>
+<h2>2. 行列表現と正規方程式</h2>
+<p>説明変数が $p$ 個のとき、デザイン行列 $X$（第 1 列は全て 1）を使って</p>
+<p>$$y=X\beta+\varepsilon,\qquad \hat\beta=(X^TX)^{-1}X^Ty,\qquad V[\hat\beta]=\sigma^2(X^TX)^{-1}$$</p>
+<p>誤差分散は $\hat\sigma^2=\dfrac{RSS}{n-p-1}$。</p>
+<p><strong>幾何学的な意味</strong>：当てはめ値 $\hat y=Hy$、$H=X(X^TX)^{-1}X^T$（<strong>ハット行列</strong>）は、$y$ を $X$ の列が張る空間へ <strong>直交射影</strong> したものです。残差 $e=y-\hat y$ はその空間と直交します。この直交性が平方和の分解の基礎です。$H$ は対称で冪等（$H^2=H$）、$\mathrm{tr}(H)=p+1$。</p>
+<p><img alt="行列表現と射影" src="img/stat08_regression_s03.png" /></p>
+<h2>3. ガウス・マルコフの定理</h2>
+<p>誤差が「平均 0・等分散・互いに無相関」（<strong>正規性は不要</strong>）のとき、最小二乗推定量は <strong>データの線形関数で不偏な推定量の中で分散が最小</strong>（BLUE: Best Linear Unbiased Estimator）です。誤差が正規分布ならさらに最尤推定量にもなります。</p>
+<p><img alt="ガウス・マルコフの定理" src="img/stat08_regression_s04.png" /></p>
+<h2>4. 分散分析表と決定係数</h2>
+<p>$$TSS=\sum(y_i-\bar y)^2=ESS+RSS$$</p>
+<p>（全変動 = 回帰で説明される変動 + 残差変動。直交性より成立。）</p>
+<ul>
+<li>決定係数 $R^2=\dfrac{ESS}{TSS}=1-\dfrac{RSS}{TSS}$（変数を増やすと必ず増える）</li>
+<li>自由度調整済み $R^2=1-\dfrac{RSS/(n-p-1)}{TSS/(n-1)}$</li>
+<li>回帰全体の検定：$F=\dfrac{ESS/p}{RSS/(n-p-1)}\sim F_{p,\,n-p-1}$（$H_0$：すべての傾きが 0）</li>
+</ul>
+<p>単回帰では $R^2=r^2$（相関係数の二乗）。</p>
+<p><img alt="分散分析表と決定係数" src="img/stat08_regression_s05.png" /></p>
+<h2>5. 係数の検定と区間</h2>
+<p>$$t=\frac{\hat\beta_j}{\mathrm{SE}(\hat\beta_j)}\sim t_{n-p-1}\quad(H_0:\beta_j=0)$$</p>
+<p>予測には 2 種類の区間があります。</p>
+<ul>
+<li><strong>平均の信頼区間</strong>：$x$ での $E[y]$ の不確かさ（直線そのもの）</li>
+<li><strong>予測区間</strong>：新しい 1 個の値 $y$ の範囲。誤差分散 $\sigma^2$ が加わるのでずっと広い</li>
+</ul>
+<p>どちらも $x$ が $\bar x$ から離れるほど広がります。</p>
+<p><img alt="信頼区間と予測区間" src="img/stat08_regression_s06.png" /></p>
+<h2>6. 残差の診断</h2>
+<p>仮定（直線性・等分散・独立・正規性）が成り立つかを残差で確認します。</p>
+<ul>
+<li><strong>残差 vs 当てはめ値</strong>：ランダムなら良好。ラッパ状 → 不等分散、曲線状 → 直線で不足</li>
+<li><strong>正規 Q-Q プロット</strong>：残差の正規性</li>
+<li><strong>ダービン・ワトソン統計量</strong>：残差の系列相関（時系列データ）</li>
+</ul>
+<p><img alt="残差診断" src="img/stat08_regression_s07.png" /></p>
+<h2>7. てこ比と影響力</h2>
+<p>ハット行列の対角成分 $h_{ii}$ が <strong>てこ比</strong>（その点の $x$ の外れ具合）。単回帰では</p>
+<p>$$h_{ii}=\frac1n+\frac{(x_i-\bar x)^2}{S_{xx}},\qquad \sum_ih_{ii}=p+1,\qquad\text{目安 }h_{ii}&gt;\frac{2(p+1)}{n}$$</p>
+<p>てこ比が大きく、かつ残差も大きい点は回帰直線を強く引っ張ります。その点を除いたときの推定の変化を測るのが <strong>クックの距離</strong> です。</p>
+<p><img alt="てこ比と影響力" src="img/stat08_regression_s08.png" /></p>
+<h2>8. 多重共線性</h2>
+<p>説明変数どうしの相関が強いと、係数の推定が不安定（標準誤差が大きい）になります。</p>
+<p>$$\mathrm{VIF}_j=\frac1{1-R_j^2}$$</p>
+<p>（$R_j^2$：第 $j$ 変数を他の説明変数で回帰したときの決定係数。）目安は 10 以上で要注意。対策は変数の削除・主成分回帰・リッジ回帰。</p>
+<p><img alt="多重共線性" src="img/stat08_regression_s09.png" /></p>
+<h2>9. 変数選択と情報量規準</h2>
+<p>変数を増やすほど残差は減りますが、予測が良くなるとは限りません。</p>
+<p>$$\mathrm{AIC}=-2\ell(\hat\theta)+2k,\qquad\mathrm{BIC}=-2\ell(\hat\theta)+k\log n$$</p>
+<p>（$k$：母数の数。<strong>小さいほど良い</strong>。BIC の方が変数を厳しく罰する。）ほかにマローズの $C_p$、クロスバリデーションなど。</p>
+<p><img alt="AIC" src="img/stat08_regression_s10.png" /></p>
+<h2>10. リッジ回帰とラッソ</h2>
+<p>$$\text{リッジ：}\ \min\ RSS+\lambda\sum\beta_j^2,\qquad\text{ラッソ：}\ \min\ RSS+\lambda\sum|\beta_j|$$</p>
+<ul>
+<li>リッジは係数を縮小（制約領域は円）。$\hat\beta=(X^TX+\lambda I)^{-1}X^Ty$ で多重共線性にも強い</li>
+<li>ラッソは制約領域が <strong>ひし形</strong> で角に当たりやすく、<strong>係数がちょうど 0 になる</strong>（変数選択）</li>
+<li>$\lambda$ はクロスバリデーションで決める。ベイズ的には、リッジは正規事前分布、ラッソはラプラス事前分布の MAP 推定</li>
+</ul>
+<p><img alt="リッジとラッソ" src="img/stat08_regression_s11.png" /></p>
+<h2>演習問題</h2>
+<h3>演習1　単回帰の計算</h3>
+<p><strong>問題</strong>　$x=1,2,3,4,5$、$y=2,4,5,4,5$。回帰係数、決定係数、傾きの $t$ 統計量を求めよ。</p>
+<p><strong>解答</strong>　$\bar x=3,\ \bar y=4$。$S_{xx}=10$、$S_{xy}=(-2)(-2)+(-1)(0)+0+(1)(0)+(2)(1)=6$。
+$\hat\beta_1=0.6$、$\hat\beta_0=4-1.8=2.2$。当てはめ値 $2.8,3.4,4.0,4.6,5.2$、残差 $-0.8,0.6,1.0,-0.6,-0.2$、$RSS=2.4$。$TSS=4+0+1+0+1=6$ なので $R^2=1-2.4/6=\mathbf{0.6}$。
+$\hat\sigma^2=2.4/3=0.8$、$\mathrm{SE}(\hat\beta_1)=\sqrt{0.8/10}=0.283$、$t=0.6/0.283\approx\mathbf{2.12}$。$t_3(0.025)=3.18$ に届かず <strong>有意でない</strong>。</p>
+<h3>演習2　$F$ 統計量と調整済み決定係数</h3>
+<p><strong>問題</strong>　$n=30$、説明変数 3 個の重回帰で $R^2=0.6$。$F$ と自由度調整済み決定係数を求めよ。</p>
+<p><strong>解答</strong>　$F=\dfrac{R^2/p}{(1-R^2)/(n-p-1)}=\dfrac{0.6/3}{0.4/26}=\dfrac{0.2}{0.01538}\approx\mathbf{13.0}$（$F_{3,26}(0.05)\approx2.98$ より有意）。調整済み $R^2=1-0.4\times\dfrac{29}{26}\approx\mathbf{0.554}$。</p>
+<h3>演習3　てこ比と VIF</h3>
+<p><strong>問題</strong>　演習1 のデータで $x=5$ のてこ比と $\sum h_{ii}$。また、ある説明変数を他の変数で回帰した決定係数が 0.9 のときの VIF は。</p>
+<p><strong>解答</strong>　$h_{55}=\dfrac15+\dfrac{(5-3)^2}{10}=\mathbf{0.6}$。$\sum h_{ii}=p+1=\mathbf2$。$\mathrm{VIF}=\dfrac1{1-0.9}=\mathbf{10}$（目安の境目）。</p>
+<h3>演習4（発展）　直交性の利用</h3>
+<p><strong>問題</strong>　最小二乗法で切片を含むとき、残差の和 $\sum e_i=0$ となることを示せ。</p>
+<p><strong>解答</strong>　$X^Te=0$（残差は $X$ の列空間と直交）で、$X$ の第 1 列は全て 1 なので $\mathbf1^Te=\sum e_i=0$。</p>
+<h2>まとめ・チェックリスト</h2>
+<ul>
+<li>[ ] $\hat\beta=(X^TX)^{-1}X^Ty$ と、直交射影・ハット行列の意味を説明できる</li>
+<li>[ ] ガウス・マルコフの定理の仮定（正規性は不要）を言える</li>
+<li>[ ] $TSS=ESS+RSS$、$R^2$、$F$ 検定、係数の $t$ 検定を計算できる</li>
+<li>[ ] 残差診断・てこ比・VIF の見方を説明できる</li>
+<li>[ ] AIC/BIC、リッジ・ラッソの違いを説明できる</li>
+</ul>
+<p>次回：<strong>一般化線形モデル</strong></p>
+<footer><span><a href="stat07_tests.html">← 第7回</a></span><a href="index.html">索引</a><span><a href="stat09_glm.html">第9回 →</a></span></footer>
+<p class="credit">動画の音声：VOICEVOX:ずんだもん / VOICEVOX:四国めたん　立ち絵：坂本アヒル様</p>
+</main></body></html>

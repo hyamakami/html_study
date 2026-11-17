@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>統計検定準1級 第4回 大数の法則・中心極限定理・標本分布</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{--bg:#f6f8fb;--fg:#222a35;--card:#fff;--line:#d3dbe8;--acc:#2a7de1;--soft:#eef4fd;--mute:#6b778a;--warn:#fff6e5;--wl:#e0a030}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--fg:#e3e8ef;--card:#1b222b;--line:#2f3a48;--acc:#6aaaf5;--soft:#1d2a3b;--mute:#98a4b6;--warn:#2d2616;--wl:#c28a2a}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 -apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+main{max-width:860px;margin:0 auto;padding:12px 16px 40px;background:var(--card);min-height:100vh;box-sizing:border-box}
+.top{color:var(--mute);font-size:.9rem;margin-top:12px}
+h1{font-size:1.65rem;margin:.3em 0 .4em;line-height:1.4}
+h2{font-size:1.3rem;border-bottom:3px solid var(--acc);padding-bottom:.15em;margin:2em 0 .6em}
+h3{font-size:1.1rem;margin:1.6em 0 .4em;border-left:5px solid var(--acc);padding-left:.5em}
+h4{font-size:1rem;margin:1.2em 0 .3em}
+blockquote{margin:1em 0;padding:.4em 1em;background:var(--soft);border-left:5px solid var(--acc);border-radius:0 8px 8px 0}
+blockquote p{margin:.4em 0}
+table{border-collapse:collapse;margin:1em 0;width:100%;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--soft)}
+img{max-width:100%;display:block;margin:12px auto;border:1px solid var(--line);border-radius:8px;background:#fff}
+img+em{display:block;text-align:center;color:var(--mute);font-size:.85rem;margin-top:-6px}
+code{background:var(--soft);padding:1px 5px;border-radius:4px}
+a{color:var(--acc)}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{display:flex;justify-content:space-between;margin:28px 0 8px;font-size:.9rem}
+.credit{color:var(--mute);font-size:.8rem}
+</style></head><body><main>
+<div class="top">統計検定準1級　解説教材　／　対応動画：<a href="../stat04_limit_sampling.mp4">stat04_limit_sampling.mp4</a></div>
+<h1>第4回　大数の法則・中心極限定理・標本分布</h1>
+<blockquote>
+<p><strong>この回の学習目標</strong></p>
+<ul>
+<li>標本平均・不偏分散の性質と、大数の法則・収束の種類を説明できる</li>
+<li>中心極限定理・正規近似（連続修正）・デルタ法を使える</li>
+<li>正規母集団の標本分布（$\chi^2$・$t$）と、自由度が $n-1$ になる理由を説明できる</li>
+</ul>
+</blockquote>
+<h2>1. 標本平均の分布</h2>
+<p>母平均 $\mu$、母分散 $\sigma^2$ の母集団から独立に $n$ 個を取る（$X_1,\dots,X_n$）。標本平均 $\bar X=\frac1n\sum X_i$ について</p>
+<p>$$E[\bar X]=\mu,\qquad V[\bar X]=\frac{\sigma^2}{n}$$</p>
+<p>標準偏差（<strong>標準誤差</strong>）は $\sigma/\sqrt n$ なので、精度を 2 倍にするには標本サイズを <strong>4 倍</strong> にします。</p>
+<p><strong>不偏分散</strong> $s^2=\dfrac1{n-1}\sum(X_i-\bar X)^2$ は $E[s^2]=\sigma^2$（$n$ で割ると偏りが出る）。</p>
+<p><img alt="標本平均の分布" src="img/stat04_limit_sampling_s02.png" /></p>
+<h2>2. 大数の法則</h2>
+<p>$$\bar X_n\to\mu\quad(n\to\infty)$$</p>
+<ul>
+<li><strong>弱法則</strong>：確率収束 $P(|\bar X_n-\mu|&gt;\varepsilon)\to0$。チェビシェフの不等式 $P(|X-\mu|\ge k\sigma)\le1/k^2$ から簡単に示せる：$P(|\bar X_n-\mu|&gt;\varepsilon)\le\dfrac{\sigma^2}{n\varepsilon^2}\to0$</li>
+<li><strong>強法則</strong>：確率 1 で収束（概収束）</li>
+</ul>
+<p><img alt="大数の法則" src="img/stat04_limit_sampling_s03.png" /></p>
+<h2>3. 収束の種類</h2>
+<table>
+<thead>
+<tr>
+<th>収束</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>概収束</td>
+<td>確率 1 で $X_n(\omega)\to X(\omega)$</td>
+</tr>
+<tr>
+<td>$L^2$（平均二乗）収束</td>
+<td>$E[(X_n-X)^2]\to0$</td>
+</tr>
+<tr>
+<td>確率収束</td>
+<td>$P(|X_n-X|&gt;\varepsilon)\to0$</td>
+</tr>
+<tr>
+<td>分布収束</td>
+<td>分布関数が（連続点で）収束</td>
+</tr>
+</tbody>
+</table>
+<p>強さの順：<strong>概収束 ⇒ 確率収束 ⇒ 分布収束</strong>、$L^2$ 収束 ⇒ 確率収束。逆は一般に不成立ですが、<strong>定数への分布収束は確率収束と同値</strong> です。</p>
+<p><strong>スルツキーの定理</strong>：$X_n\xrightarrow{d}X$, $Y_n\xrightarrow{p}c$（定数）なら $X_n+Y_n\xrightarrow{d}X+c$, $X_nY_n\xrightarrow{d}cX$, $X_n/Y_n\xrightarrow{d}X/c$（$c\ne0$）。母分散を標本分散で置き換える議論で頻繁に使います。</p>
+<p><img alt="収束の種類" src="img/stat04_limit_sampling_s04.png" /></p>
+<h2>4. 中心極限定理</h2>
+<p>$X_1,\dots,X_n$ が独立同分布で、平均 $\mu$、分散 $\sigma^2$（有限）のとき</p>
+<p>$$\frac{\sqrt n(\bar X_n-\mu)}{\sigma}\xrightarrow{d}N(0,1)$$</p>
+<p>母集団の分布が何でも成り立ちます。ただし元の分布が偏っているほど大きな $n$ が必要です（目安 $n\ge30$）。右に裾の長い指数分布でも、標本平均の分布は $n$ とともに釣り鐘型に近づきます。</p>
+<p>（証明の骨子：標準化した和の積率母関数を展開すると $1+\frac{t^2}{2n}+o(1/n)$ となり、$n$ 乗して $e^{t^2/2}$ に収束する。）</p>
+<p><img alt="中心極限定理" src="img/stat04_limit_sampling_s05.png" /></p>
+<h2>5. 二項分布の正規近似と連続修正</h2>
+<p>$X\sim B(n,p)$ は $n$ が大きいとき $N(np,\,np(1-p))$ で近似できます（目安：$np\ge5$ かつ $n(1-p)\ge5$）。離散を連続で近似するので、<strong>連続修正</strong> を行います。</p>
+<p>$$P(X\le k)\approx\Phi\left(\frac{k+0.5-np}{\sqrt{np(1-p)}}\right),\qquad P(X\ge k)\approx1-\Phi\left(\frac{k-0.5-np}{\sqrt{np(1-p)}}\right)$$</p>
+<p><img alt="正規近似" src="img/stat04_limit_sampling_s06.png" /></p>
+<h2>6. デルタ法</h2>
+<p>$\sqrt n(\bar X-\mu)\xrightarrow{d}N(0,\sigma^2)$ で $g$ が微分可能（$g'(\mu)\ne0$）なら</p>
+<p>$$\sqrt n\{g(\bar X)-g(\mu)\}\xrightarrow{d}N\big(0,\ g'(\mu)^2\sigma^2\big)$$</p>
+<p>$g$ を $\mu$ のまわりで一次近似 $g(\bar X)\approx g(\mu)+g'(\mu)(\bar X-\mu)$ すると、広がりが接線の傾き倍になる、という考え方です。比や対数変換の分散の近似、分散安定化変換に使います。</p>
+<p><img alt="デルタ法" src="img/stat04_limit_sampling_s07.png" /></p>
+<h2>7. 正規母集団の標本分布</h2>
+<p>母集団が $N(\mu,\sigma^2)$ のとき、<strong>有限の $n$ でも正確な分布</strong> が分かります。</p>
+<p>$$\bar X\sim N\left(\mu,\frac{\sigma^2}{n}\right),\qquad \frac{(n-1)s^2}{\sigma^2}\sim\chi^2_{n-1},\qquad \bar X\ \text{と}\ s^2\ \text{は独立}$$</p>
+<p>$\sigma$ を $s$ で置き換えると</p>
+<p>$$t=\frac{\bar X-\mu}{s/\sqrt n}=\frac{(\bar X-\mu)/(\sigma/\sqrt n)}{\sqrt{\{(n-1)s^2/\sigma^2\}/(n-1)}}\sim t_{n-1}$$</p>
+<p><strong>$\bar X$ と $s^2$ が独立</strong> であることが $t$ 分布の定義に必要で、これは正規分布に特有の性質です。</p>
+<p><img alt="正規母集団の標本分布" src="img/stat04_limit_sampling_s08.png" /></p>
+<h2>8. 偏差平方和の分解とコクランの定理</h2>
+<p>$$\sum(X_i-\mu)^2=\sum(X_i-\bar X)^2+n(\bar X-\mu)^2$$</p>
+<p>両辺を $\sigma^2$ で割ると、左辺は $\chi^2_n$、右辺第 2 項は $\chi^2_1$ なので、第 1 項は $\chi^2_{n-1}$（かつ独立）になります。標本平均を使うと <strong>自由度が 1 減る</strong> のはこのためです。この「二乗和の分解と独立性」を保証するのがコクランの定理で、回帰や分散分析でも同じ構造が現れます。</p>
+<p><img alt="偏差平方和の分解" src="img/stat04_limit_sampling_s09.png" /></p>
+<h2>演習問題</h2>
+<h3>演習1　正規近似</h3>
+<p><strong>問題</strong>　コインを 100 回投げて表が 60 回以上出る確率を、連続修正つきの正規近似で求めよ。</p>
+<p><strong>解答</strong>　$X\sim B(100,0.5)$ で $\mu=50$, $\sigma=\sqrt{25}=5$。$P(X\ge60)=P(X\ge59.5)$ なので $z=\dfrac{59.5-50}{5}=1.9$、$P(Z\ge1.9)\approx\mathbf{0.029}$。（修正なしだと $z=2.0$ で約 0.023 となりずれる。）</p>
+<h3>演習2　標本平均</h3>
+<p><strong>問題</strong>　母集団が $N(100,15^2)$。25 個の標本平均が 105 を超える確率は。</p>
+<p><strong>解答</strong>　$\bar X\sim N(100,\,(15/5)^2=3^2)$。$z=\dfrac{105-100}{3}\approx1.67$、$P(Z&gt;1.67)\approx\mathbf{0.048}$。個々の値でなく平均なので、ばらつきが小さく確率は低くなる。</p>
+<h3>演習3　標本分散の分布</h3>
+<p><strong>問題</strong>　正規母集団から $n=10$ の標本を取り、不偏分散を $s^2$ とする。$P(s^2&gt;1.88\sigma^2)$ を求めよ（$\chi^2_9$ の上側 5% 点は 16.92）。</p>
+<p><strong>解答</strong>　$\dfrac{9s^2}{\sigma^2}\sim\chi^2_9$。$s^2&gt;1.88\sigma^2\Leftrightarrow\dfrac{9s^2}{\sigma^2}&gt;9\times1.88=16.92$ なので、確率は <strong>5%</strong>。</p>
+<h3>演習4（発展）　デルタ法</h3>
+<p><strong>問題</strong>　$X_1,\dots,X_n\sim$ ポアソン $Po(\lambda)$ のとき、$\sqrt{\bar X}$ の漸近分散を求めよ（分散安定化変換）。</p>
+<p><strong>解答</strong>　$g(x)=\sqrt x$, $g'(\lambda)=\dfrac1{2\sqrt\lambda}$。$\sqrt n(\sqrt{\bar X}-\sqrt\lambda)\to N\left(0,\dfrac{1}{4\lambda}\cdot\lambda\right)=N\left(0,\dfrac14\right)$。分散が $\lambda$ に依存しなくなる。</p>
+<h2>まとめ・チェックリスト</h2>
+<ul>
+<li>[ ] $V[\bar X]=\sigma^2/n$ と不偏分散を説明できる</li>
+<li>[ ] 大数の法則（弱・強）と収束の種類の強さの順を言える</li>
+<li>[ ] 中心極限定理・連続修正つき正規近似・デルタ法を計算に使える</li>
+<li>[ ] $\bar X$ と $s^2$ の独立性、$(n-1)s^2/\sigma^2\sim\chi^2_{n-1}$、$t_{n-1}$ の導出を説明できる</li>
+</ul>
+<p>次回：<strong>点推定と最尤法</strong></p>
+<footer><span><a href="stat03_multivariate.html">← 第3回</a></span><a href="index.html">索引</a><span><a href="stat05_estimation.html">第5回 →</a></span></footer>
+<p class="credit">動画の音声：VOICEVOX:ずんだもん / VOICEVOX:四国めたん　立ち絵：坂本アヒル様</p>
+</main></body></html>

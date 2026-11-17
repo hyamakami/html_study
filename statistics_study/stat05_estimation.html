@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>統計検定準1級 第5回 点推定と最尤法</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{--bg:#f6f8fb;--fg:#222a35;--card:#fff;--line:#d3dbe8;--acc:#2a7de1;--soft:#eef4fd;--mute:#6b778a;--warn:#fff6e5;--wl:#e0a030}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--fg:#e3e8ef;--card:#1b222b;--line:#2f3a48;--acc:#6aaaf5;--soft:#1d2a3b;--mute:#98a4b6;--warn:#2d2616;--wl:#c28a2a}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 -apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+main{max-width:860px;margin:0 auto;padding:12px 16px 40px;background:var(--card);min-height:100vh;box-sizing:border-box}
+.top{color:var(--mute);font-size:.9rem;margin-top:12px}
+h1{font-size:1.65rem;margin:.3em 0 .4em;line-height:1.4}
+h2{font-size:1.3rem;border-bottom:3px solid var(--acc);padding-bottom:.15em;margin:2em 0 .6em}
+h3{font-size:1.1rem;margin:1.6em 0 .4em;border-left:5px solid var(--acc);padding-left:.5em}
+h4{font-size:1rem;margin:1.2em 0 .3em}
+blockquote{margin:1em 0;padding:.4em 1em;background:var(--soft);border-left:5px solid var(--acc);border-radius:0 8px 8px 0}
+blockquote p{margin:.4em 0}
+table{border-collapse:collapse;margin:1em 0;width:100%;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--soft)}
+img{max-width:100%;display:block;margin:12px auto;border:1px solid var(--line);border-radius:8px;background:#fff}
+img+em{display:block;text-align:center;color:var(--mute);font-size:.85rem;margin-top:-6px}
+code{background:var(--soft);padding:1px 5px;border-radius:4px}
+a{color:var(--acc)}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{display:flex;justify-content:space-between;margin:28px 0 8px;font-size:.9rem}
+.credit{color:var(--mute);font-size:.8rem}
+</style></head><body><main>
+<div class="top">統計検定準1級　解説教材　／　対応動画：<a href="../stat05_estimation.mp4">stat05_estimation.mp4</a></div>
+<h1>第5回　点推定と最尤法</h1>
+<blockquote>
+<p><strong>この回の学習目標</strong></p>
+<ul>
+<li>推定量の良さ（不偏性・一致性・有効性・MSE）を評価できる</li>
+<li>十分統計量、ラオ・ブラックウェル、クラメール・ラオの不等式を説明できる</li>
+<li>最尤法・モーメント法で推定量を導出し、最尤推定量の性質を使える</li>
+</ul>
+</blockquote>
+<h2>1. 推定量の性質</h2>
+<p>母数 $\theta$ の推定量 $\hat\theta$ はデータの関数なので、それ自身が <strong>確率変数</strong> です。</p>
+<table>
+<thead>
+<tr>
+<th>性質</th>
+<th>定義</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>不偏性</td>
+<td>$E[\hat\theta]=\theta$</td>
+</tr>
+<tr>
+<td>一致性</td>
+<td>$\hat\theta_n\xrightarrow{p}\theta$（$n\to\infty$）</td>
+</tr>
+<tr>
+<td>有効性</td>
+<td>不偏推定量の中で分散が小さい</td>
+</tr>
+<tr>
+<td>平均二乗誤差</td>
+<td>$\mathrm{MSE}=E[(\hat\theta-\theta)^2]=\underbrace{(E[\hat\theta]-\theta)^2}_{\text{偏り}^2}+V[\hat\theta]$</td>
+</tr>
+</tbody>
+</table>
+<p>不偏でも分散が大きい推定量より、<strong>少し偏っていても分散が小さい</strong> 推定量の方が MSE が小さいことがあります。</p>
+<p><img alt="推定量の性質" src="img/stat05_estimation_s02.png" /></p>
+<h2>2. 例：分散の推定量と MSE</h2>
+<p>正規母集団で $S=\sum(X_i-\bar X)^2\sim\sigma^2\chi^2_{n-1}$。$d$ で割った推定量 $S/d$ の MSE を $\sigma^4$ で割ると</p>
+<p>$$\frac{\mathrm{MSE}}{\sigma^4}=\left(\frac{n-1}{d}-1\right)^2+\frac{2(n-1)}{d^2}$$</p>
+<ul>
+<li>$d=n-1$：不偏分散</li>
+<li>$d=n$：最尤推定量</li>
+<li><strong>$d=n+1$ で MSE 最小</strong></li>
+</ul>
+<p>不偏性は絶対的な基準ではなく、バイアスと分散のトレードオフがあります。</p>
+<p><img alt="分散の推定量とMSE" src="img/stat05_estimation_s03.png" /></p>
+<h2>3. 十分統計量</h2>
+<p>統計量 $T(X)$ が <strong>十分</strong> とは、$T$ を知れば $\theta$ について元のデータ以上の情報が得られないことです。</p>
+<p><strong>フィッシャー・ネイマンの分解定理</strong>：同時密度（確率）が</p>
+<p>$$f(x;\theta)=g\big(T(x),\theta\big)\,h(x)$$</p>
+<p>（$h$ は $\theta$ を含まない）と書けるとき $T$ は十分統計量。</p>
+<ul>
+<li>正規分布（平均・分散とも未知）：$(\sum X_i,\ \sum X_i^2)$</li>
+<li>ポアソン：$\sum X_i$</li>
+<li>指数型分布族では十分統計量がすぐ見つかる</li>
+</ul>
+<p><img alt="十分統計量" src="img/stat05_estimation_s04.png" /></p>
+<h2>4. ラオ・ブラックウェルの定理と UMVUE</h2>
+<p>不偏推定量 $\hat\theta$ を十分統計量 $T$ で条件付けた $E[\hat\theta\mid T]$ は、不偏のまま <strong>分散が同じか小さくなる</strong>（ラオ・ブラックウェル）。</p>
+<p>さらに $T$ が <strong>完備</strong> な十分統計量なら、$T$ の関数である不偏推定量は一意で、<strong>一様最小分散不偏推定量（UMVUE）</strong> になります（レーマン・シェッフェ）。</p>
+<h2>5. フィッシャー情報量とクラメール・ラオの不等式</h2>
+<p><strong>フィッシャー情報量</strong>（1 個の観測あたり）</p>
+<p>$$I(\theta)=E\left[\left(\frac{\partial\log f(X;\theta)}{\partial\theta}\right)^2\right]=-E\left[\frac{\partial^2\log f(X;\theta)}{\partial\theta^2}\right]$$</p>
+<p>対数尤度の山の鋭さ（曲率）です。独立な $n$ 個なら $nI(\theta)$。</p>
+<p><strong>クラメール・ラオの不等式</strong>：$\theta$ の任意の不偏推定量について</p>
+<p>$$V[\hat\theta]\ge\frac{1}{nI(\theta)}$$</p>
+<p>下限に達する推定量を <strong>有効推定量</strong> と呼びます。</p>
+<p><img alt="フィッシャー情報量" src="img/stat05_estimation_s06.png" /></p>
+<p>例：ベルヌーイ $I(p)=\dfrac1{p(1-p)}$、ポアソン $I(\lambda)=\dfrac1\lambda$、正規（$\sigma$ 既知）の $\mu$ について $I=\dfrac1{\sigma^2}$。</p>
+<h2>6. 最尤法</h2>
+<p><strong>尤度</strong> $L(\theta)=\prod_{i=1}^nf(x_i;\theta)$ を最大にする $\theta$ が <strong>最尤推定量（MLE）</strong> $\hat\theta$。対数尤度 $\ell=\log L$ を微分して 0 とおく（尤度方程式）：</p>
+<p>$$\frac{\partial\ell}{\partial\theta}=0$$</p>
+<table>
+<thead>
+<tr>
+<th>分布</th>
+<th>最尤推定量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ベルヌーイ・二項（$n$ 回中 $k$ 回成功）</td>
+<td>$\hat p=k/n$</td>
+</tr>
+<tr>
+<td>正規</td>
+<td>$\hat\mu=\bar x,\ \ \hat\sigma^2=\dfrac1n\sum(x_i-\bar x)^2$（<strong>$n$ で割る</strong>）</td>
+</tr>
+<tr>
+<td>ポアソン</td>
+<td>$\hat\lambda=\bar x$</td>
+</tr>
+<tr>
+<td>指数（率）</td>
+<td>$\hat\lambda=1/\bar x$</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="最尤法" src="img/stat05_estimation_s07.png" /></p>
+<p><strong>微分で解けない例</strong>：$U(0,\theta)$ では $L(\theta)=\theta^{-n}$（$\theta\ge x_{(n)}$）が減少関数なので、$\hat\theta=X_{(n)}$（最大値）になります。</p>
+<h2>7. 最尤推定量の性質</h2>
+<p>正則条件のもとで、</p>
+<ol>
+<li><strong>一致性</strong></li>
+<li><strong>漸近正規性</strong>：$\sqrt n(\hat\theta-\theta)\xrightarrow{d}N\big(0,\ I(\theta)^{-1}\big)$</li>
+<li><strong>漸近有効性</strong>（分散がクラメール・ラオの下限に一致）</li>
+<li><strong>不変性</strong>：$\theta$ の MLE が $\hat\theta$ なら、$g(\theta)$ の MLE は $g(\hat\theta)$</li>
+</ol>
+<p>有限標本では偏りが残ることもあります（例：正規の $\hat\sigma^2$）。</p>
+<p><img alt="最尤推定量の分布" src="img/stat05_estimation_s08.png" /></p>
+<h2>8. モーメント法</h2>
+<p>標本モーメントを理論モーメントに等しいとおいて母数を解く方法です。ガンマ分布なら平均 $\alpha/\lambda$、分散 $\alpha/\lambda^2$ から</p>
+<p>$$\hat\alpha=\frac{\bar x^2}{s^2},\qquad\hat\lambda=\frac{\bar x}{s^2}$$</p>
+<p>尤度方程式が解きにくいときに便利ですが、一般に最尤法より効率が劣ります。</p>
+<h2>9. EM アルゴリズム</h2>
+<p>混合分布のように <strong>どの成分から来たか（潜在変数）</strong> が分からないとき、尤度の直接最大化は困難です。</p>
+<ul>
+<li><strong>E ステップ</strong>：現在の母数で、各データが各成分に属する確率（負担率）を計算</li>
+<li><strong>M ステップ</strong>：その確率を重みにして、重み付き最尤で母数を更新</li>
+</ul>
+<p>これを繰り返すと尤度が <strong>単調に増加</strong> して局所最大に収束します（初期値依存に注意）。</p>
+<p><img alt="EMアルゴリズム" src="img/stat05_estimation_s10.png" /></p>
+<h2>演習問題</h2>
+<h3>演習1　一様分布の最尤推定</h3>
+<p><strong>問題</strong>　$U(0,\theta)$ から $n$ 個の標本。$\theta$ の最尤推定量とその期待値を求めよ。</p>
+<p><strong>解答</strong>　$L(\theta)=\theta^{-n}$（$\theta\ge x_{(n)}$）、それ未満では 0。減少関数なので $\hat\theta=X_{(n)}$。最大値の密度は $nx^{n-1}/\theta^n$ なので $E[\hat\theta]=\dfrac{n}{n+1}\theta$、<strong>不偏でない</strong>。$\dfrac{n+1}{n}X_{(n)}$ にすれば不偏。</p>
+<h3>演習2　ポアソン分布とクラメール・ラオ</h3>
+<p><strong>問題</strong>　ポアソン分布の $\lambda$ について、最尤推定量・フィッシャー情報量・クラメール・ラオの下限を求めよ。</p>
+<p><strong>解答</strong>　$\ell=-n\lambda+\sum x_i\log\lambda+\text{定数}$、$\ell'=-n+\dfrac{\sum x_i}{\lambda}=0$ より $\hat\lambda=\bar X$。$I(\lambda)=1/\lambda$、下限 $\dfrac{\lambda}{n}$。$V[\bar X]=\dfrac\lambda n$ で一致するので <strong>$\bar X$ は有効推定量</strong>。</p>
+<h3>演習3　モーメント法と効率</h3>
+<p><strong>問題</strong>　$U(0,\theta)$ について、モーメント推定量と修正最尤推定量の分散を比較せよ。</p>
+<p><strong>解答</strong>　$E[X]=\theta/2$ より $\tilde\theta=2\bar X$（不偏）、$V[\tilde\theta]=4\cdot\dfrac{\theta^2/12}{n}=\dfrac{\theta^2}{3n}$。修正最尤推定量 $\hat\theta^*=\dfrac{n+1}{n}X_{(n)}$ は $V[X_{(n)}]=\dfrac{n\theta^2}{(n+1)^2(n+2)}$ より $V[\hat\theta^*]=\dfrac{\theta^2}{n(n+2)}$。<strong>$n^2$ に反比例して小さい</strong>ので最尤の方が効率的。</p>
+<h3>演習4（発展）　指数分布の MLE の偏り</h3>
+<p><strong>問題</strong>　指数分布（率 $\lambda$）の最尤推定量 $\hat\lambda=1/\bar X$ は不偏か。</p>
+<p><strong>解答</strong>　$\sum X_i\sim\mathrm{Gamma}(n,\lambda)$ で $E[1/\sum X_i]=\dfrac{\lambda}{n-1}$。よって $E[\hat\lambda]=n\cdot\dfrac{\lambda}{n-1}=\dfrac{n}{n-1}\lambda$。<strong>不偏でない</strong>（$\frac{n-1}{n}\hat\lambda$ なら不偏）。ただし一致推定量。</p>
+<h2>まとめ・チェックリスト</h2>
+<ul>
+<li>[ ] 不偏性・一致性・有効性・MSE（偏り² + 分散）を区別できる</li>
+<li>[ ] 分解定理で十分統計量を見つけられる</li>
+<li>[ ] フィッシャー情報量を計算し、クラメール・ラオの下限と比べられる</li>
+<li>[ ] 尤度方程式から MLE を導出できる（微分できない場合も含む）</li>
+<li>[ ] 最尤推定量の 4 つの性質、モーメント法、EM アルゴリズムの流れを説明できる</li>
+</ul>
+<p>次回：<strong>区間推定と仮説検定の理論</strong></p>
+<footer><span><a href="stat04_limit_sampling.html">← 第4回</a></span><a href="index.html">索引</a><span><a href="stat06_testing_theory.html">第6回 →</a></span></footer>
+<p class="credit">動画の音声：VOICEVOX:ずんだもん / VOICEVOX:四国めたん　立ち絵：坂本アヒル様</p>
+</main></body></html>

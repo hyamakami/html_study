@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>統計検定準1級 第12回 多変量解析</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{--bg:#f6f8fb;--fg:#222a35;--card:#fff;--line:#d3dbe8;--acc:#2a7de1;--soft:#eef4fd;--mute:#6b778a;--warn:#fff6e5;--wl:#e0a030}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--fg:#e3e8ef;--card:#1b222b;--line:#2f3a48;--acc:#6aaaf5;--soft:#1d2a3b;--mute:#98a4b6;--warn:#2d2616;--wl:#c28a2a}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 -apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+main{max-width:860px;margin:0 auto;padding:12px 16px 40px;background:var(--card);min-height:100vh;box-sizing:border-box}
+.top{color:var(--mute);font-size:.9rem;margin-top:12px}
+h1{font-size:1.65rem;margin:.3em 0 .4em;line-height:1.4}
+h2{font-size:1.3rem;border-bottom:3px solid var(--acc);padding-bottom:.15em;margin:2em 0 .6em}
+h3{font-size:1.1rem;margin:1.6em 0 .4em;border-left:5px solid var(--acc);padding-left:.5em}
+h4{font-size:1rem;margin:1.2em 0 .3em}
+blockquote{margin:1em 0;padding:.4em 1em;background:var(--soft);border-left:5px solid var(--acc);border-radius:0 8px 8px 0}
+blockquote p{margin:.4em 0}
+table{border-collapse:collapse;margin:1em 0;width:100%;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--soft)}
+img{max-width:100%;display:block;margin:12px auto;border:1px solid var(--line);border-radius:8px;background:#fff}
+img+em{display:block;text-align:center;color:var(--mute);font-size:.85rem;margin-top:-6px}
+code{background:var(--soft);padding:1px 5px;border-radius:4px}
+a{color:var(--acc)}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{display:flex;justify-content:space-between;margin:28px 0 8px;font-size:.9rem}
+.credit{color:var(--mute);font-size:.8rem}
+</style></head><body><main>
+<div class="top">統計検定準1級　解説教材　／　対応動画：<a href="../stat12_multivariate_analysis.mp4">stat12_multivariate_analysis.mp4</a></div>
+<h1>第12回　多変量解析</h1>
+<blockquote>
+<p><strong>この回の学習目標</strong></p>
+<ul>
+<li>主成分分析を固有値分解として理解し、寄与率を計算できる</li>
+<li>因子分析・判別分析・正準相関分析・MDS の考え方と式を説明できる</li>
+<li>階層的クラスタリングの連結法と k-means 法の手順を説明できる</li>
+</ul>
+</blockquote>
+<h2>1. 主成分分析（PCA）</h2>
+<p>多数の変数を、情報をなるべく失わずに少数の合成変数（主成分）にまとめる方法です。第 1 主成分は <strong>データの分散が最大になる方向</strong> $a_1$（$\|a_1\|=1$）です。</p>
+<p>$$\max_{\|a\|=1}\ V[a^TX]=a^T\Sigma a$$</p>
+<p>この解は分散共分散行列 $\Sigma$ の <strong>最大固有値に対応する固有ベクトル</strong>、そのときの分散が固有値 $\lambda_1$ です。第 2 主成分は第 1 主成分と直交する方向の中で分散が最大のもの（$\lambda_2$ に対応する固有ベクトル）、…と続きます。主成分どうしは無相関です。</p>
+<p><img alt="主成分分析" src="img/stat12_multivariate_analysis_s02.png" /></p>
+<h2>2. 寄与率と解釈</h2>
+<p>$$\text{寄与率}=\frac{\lambda_k}{\sum_j\lambda_j},\qquad\text{累積寄与率}=\frac{\sum_{j\le k}\lambda_j}{\sum_j\lambda_j}$$</p>
+<ul>
+<li>使う主成分の数の目安：<strong>累積寄与率 80% 程度</strong>、または固有値が 1 以上（相関行列のとき）。固有値を大きい順に並べた図が <strong>スクリープロット</strong></li>
+<li>単位が異なる変数は標準化して <strong>相関行列</strong> から主成分を求める（このとき固有値の合計は変数の数 $p$）</li>
+<li>主成分と元の変数の相関（因子負荷量）で、各主成分の意味を解釈する</li>
+</ul>
+<p><img alt="寄与率とスクリープロット" src="img/stat12_multivariate_analysis_s03.png" /></p>
+<h2>3. 因子分析</h2>
+<p>観測変数の背後にある <strong>共通因子</strong> を考えるモデルです。</p>
+<p>$$X=\Lambda f+\varepsilon,\qquad\Sigma=\Lambda\Lambda^T+\Psi$$</p>
+<p>（$\Lambda$：因子負荷量行列、$f$：共通因子、$\varepsilon$：独自因子、$\Psi$：独自分散の対角行列。）</p>
+<ul>
+<li>主成分分析は「変数から合成変数を作る」、因子分析は「<strong>変数が因子から生じる</strong>」というモデル</li>
+<li>因子は回転しても $\Sigma=\Lambda\Lambda^T+\Psi$ が変わらない（不定性）ので、解釈しやすいようにバリマックス回転（直交）やプロマックス回転（斜交）を行う</li>
+</ul>
+<p><img alt="因子分析" src="img/stat12_multivariate_analysis_s04.png" /></p>
+<h2>4. 判別分析</h2>
+<p>あらかじめ群が分かっているデータから、新しい個体の群を判別します。各群が <strong>等しい共分散行列</strong> の正規分布に従うと仮定すると、判別の方向は</p>
+<p>$$w=\Sigma^{-1}(\mu_1-\mu_2),\qquad\text{境界：}\ w^T\left(x-\frac{\mu_1+\mu_2}{2}\right)=0$$</p>
+<p>（<strong>線形判別分析</strong>）。$w^T(x-m)&gt;0$ なら群 1 に判別します。共分散が群ごとに異なると境界が曲線になり、<strong>二次判別分析</strong> を使います。誤判別率は交差検証で評価します。</p>
+<p><img alt="判別分析" src="img/stat12_multivariate_analysis_s05.png" /></p>
+<h2>5. 階層的クラスタリング</h2>
+<p>群が未知のデータを、似たもの同士で分けます。近い個体（クラスタ）から順に併合し、結果を <strong>デンドログラム（樹形図）</strong> で表します。クラスタ間の距離の測り方（連結法）：</p>
+<table>
+<thead>
+<tr>
+<th>連結法</th>
+<th>クラスタ間距離</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>単連結（最短距離法）</td>
+<td>最も近い点どうしの距離（鎖状につながりやすい）</td>
+</tr>
+<tr>
+<td>完全連結（最長距離法）</td>
+<td>最も遠い点どうしの距離</td>
+</tr>
+<tr>
+<td>群平均法</td>
+<td>すべての点対の平均距離</td>
+</tr>
+<tr>
+<td>ウォード法</td>
+<td>併合による平方和の増加が最小になる組を併合</td>
+</tr>
+</tbody>
+</table>
+<p>ある高さでデンドログラムを切るとクラスタが決まります。</p>
+<p><img alt="階層的クラスタリング" src="img/stat12_multivariate_analysis_s06.png" /></p>
+<h2>6. k-means 法</h2>
+<p>クラスタ数 $k$ を先に決める非階層的な方法です。</p>
+<ol>
+<li>適当な $k$ 個の中心を置く</li>
+<li>各点を最も近い中心に割り当てる</li>
+<li>各クラスタの重心に中心を更新する</li>
+<li>2, 3 を変化がなくなるまで繰り返す</li>
+</ol>
+<p>クラスタ内平方和は単調に減少しますが <strong>局所解</strong> に陥るため、初期値を変えて複数回実行します。$k$ の決め方：エルボー法、シルエット係数。</p>
+<p><img alt="k-means法" src="img/stat12_multivariate_analysis_s07.png" /></p>
+<h2>7. 正準相関分析</h2>
+<p>2 組の変数群 $X$, $Y$ から、それぞれの線形結合 $u=a^TX$, $v=b^TY$ を作り、<strong>その相関が最大</strong> になるようにします。第 1 正準相関が最大の相関で、次の組は以前の組と無相関という条件で順に求めます。<strong>正準相関係数の二乗</strong> は、共分散行列から作る行列 $\Sigma_{XX}^{-1}\Sigma_{XY}\Sigma_{YY}^{-1}\Sigma_{YX}$ の固有値に等しくなります。重回帰（目的変数が 1 つ）の拡張です。</p>
+<p><img alt="正準相関分析" src="img/stat12_multivariate_analysis_s08.png" /></p>
+<h2>8. 多次元尺度構成法（MDS）</h2>
+<p>個体間の <strong>距離（非類似度）の情報だけ</strong> から、低次元の配置（地図）を求めます。古典的 MDS は距離行列から内積行列（二重中心化）を作って固有値分解します。ユークリッド距離ならば主成分分析と同じ結果になります。向きや反転は決まりません。</p>
+<p><img alt="多次元尺度構成法" src="img/stat12_multivariate_analysis_s09.png" /></p>
+<h2>演習問題</h2>
+<h3>演習1　主成分分析</h3>
+<p><strong>問題</strong>　共分散行列が $\begin{pmatrix}4&amp;2\\2&amp;3\end{pmatrix}$ のとき、固有値と第 1 主成分の寄与率を求めよ。</p>
+<p><strong>解答</strong>　トレース $=7$、行列式 $=12-4=8$。固有方程式 $\lambda^2-7\lambda+8=0$ より $\lambda=\dfrac{7\pm\sqrt{17}}2\approx\mathbf{5.56,\ 1.44}$。寄与率 $5.56/7\approx\mathbf{0.79}$。</p>
+<h3>演習2　線形判別</h3>
+<p><strong>問題</strong>　2 群の平均が $\mu_1=(2,0)^T$, $\mu_2=(0,0)^T$、共通の共分散行列 $\Sigma=\begin{pmatrix}1&amp;0.5\\0.5&amp;1\end{pmatrix}$。判別の方向 $w$ と、点 $(1.5,\,0.5)$ がどちらの群に判別されるかを答えよ。</p>
+<p><strong>解答</strong>　$\Sigma^{-1}=\dfrac1{0.75}\begin{pmatrix}1&amp;-0.5\\-0.5&amp;1\end{pmatrix}$。$\mu_1-\mu_2=(2,0)^T$ より $w=\dfrac1{0.75}(2,\,-1)^T=\left(\dfrac83,\,-\dfrac43\right)^T$。中点 $m=(1,0)^T$。
+$x-m=(0.5,0.5)$ なので $w^T(x-m)=\dfrac43-\dfrac23=\dfrac23&gt;0$。<strong>群 1</strong> に判別。</p>
+<h3>演習3　連結法</h3>
+<p><strong>問題</strong>　1 次元の 5 点 $\{1,2,6,7,12\}$ をユークリッド距離で階層的に併合する。単連結と完全連結の「最後の併合の距離」を求めよ。</p>
+<p><strong>解答</strong>
+単連結：$\{1,2\}$（距離 1）、$\{6,7\}$（1）、続いて 2 と 6 の距離 4 で併合、最後に 12 が 7 との距離 5 で併合 → <strong>5</strong>。
+完全連結：$\{1,2\}$（1）、$\{6,7\}$（1）、$\{1,2\}$–$\{6,7\}$ は最遠の 1 と 7 の距離 6、最後に 12 と 1 の距離 11 → <strong>11</strong>。</p>
+<h3>演習4（発展）　相関行列の固有値</h3>
+<p><strong>問題</strong>　3 変数の相関行列の固有値が $2.1,\ 0.6,\ x$ のとき、$x$ と第 1 主成分の寄与率を求めよ。</p>
+<p><strong>解答</strong>　相関行列の固有値の合計は変数の数 3 なので $x=0.3$。寄与率 $2.1/3=\mathbf{0.70}$。</p>
+<h2>まとめ・チェックリスト</h2>
+<ul>
+<li>[ ] 主成分分析 = 共分散行列の固有値分解、寄与率・累積寄与率の計算</li>
+<li>[ ] 主成分分析と因子分析のモデルの違いを説明できる</li>
+<li>[ ] 線形判別の方向 $w=\Sigma^{-1}(\mu_1-\mu_2)$ と判別境界を計算できる</li>
+<li>[ ] 連結法（単・完全・群平均・ウォード）と k-means の手順を説明できる</li>
+<li>[ ] 正準相関・MDS の目的を説明できる</li>
+</ul>
+<p>次回：<strong>時系列解析</strong></p>
+<footer><span><a href="stat11_bayes.html">← 第11回</a></span><a href="index.html">索引</a><span><a href="stat13_timeseries.html">第13回 →</a></span></footer>
+<p class="credit">動画の音声：VOICEVOX:ずんだもん / VOICEVOX:四国めたん　立ち絵：坂本アヒル様</p>
+</main></body></html>
